@@ -7,18 +7,18 @@
 
 <script lang="ts">
 import Vue from "vue";
+import Component from "vue-class-component";
+
 import HomeComponent from "@/components/HomeComponent.vue";
 
-export default Vue.extend({
+@Component({
   components: {
     HomeComponent
-  },
-  computed: {
-    type() {
-      return this.$route.path;
-    }
   }
-});
+})
+export default class LicitatiiView extends Vue {
+  get type() {
+    return this.$route.path;
+  }
+}
 </script>
-
-<style scoped></style>

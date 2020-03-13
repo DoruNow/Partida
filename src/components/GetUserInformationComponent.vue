@@ -35,7 +35,7 @@
           item-value="value"
         ></v-select>
         <v-btn :disabled="!settingsForm" color="success" @click="goToGame"
-          >Create Links</v-btn
+          >Log the data</v-btn
         >
       </v-form>
     </v-card>
@@ -44,33 +44,35 @@
 
 <script lang="ts">
 import Vue from "vue";
+import Component from "vue-class-component";
 
-export default Vue.extend({
+const FormTypeProps = Vue.extend({
   props: {
     formType: {
       type: String
     }
-  },
-  data() {
-    return {
-      showForm: false,
-      settingsForm: null,
-      menuCardButtonText: "",
-      playerName: "Doru",
-      roomName: "KingPin",
-      select: {},
-      showIfJoinGame: false,
-      playerSelection: [
-        { text: "Player 2", value: 2 },
-        { text: "Player 3", value: 3 },
-        { text: "Player 4", value: 4 }
-      ],
-      required: [(v: object | string) => !!v || "Required field"],
-      settings: {
-        roomName: String
-      }
-    };
-  },
+  }
+});
+
+@Component
+export default class GetUserInformationComponent extends FormTypeProps {
+  select = {};
+  menuCardButtonText = "";
+  showIfJoinGame = false;
+  showForm = false;
+  settingsForm = null;
+  playerName = "Doru";
+  roomName = "KingPin";
+  playerSelection = [
+    { text: "Player 2", value: 2 },
+    { text: "Player 3", value: 3 },
+    { text: "Player 4", value: 4 }
+  ];
+  required = [(v: object | string) => !!v || "Required field"];
+  settings = {
+    roomName: String
+  };
+
   mounted() {
     this.select = { value: null };
 
@@ -81,11 +83,11 @@ export default Vue.extend({
       this.menuCardButtonText = "Join Game";
       this.showIfJoinGame = true;
     }
-  },
-  methods: {
-    goToGame() {
-      //
-    }
   }
-});
+
+  goToGame(): void {
+    // TODO add real implementation
+    console.log(this.playerName);
+  }
+}
 </script>

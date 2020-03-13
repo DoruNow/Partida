@@ -5,13 +5,15 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue";
+import Component from "vue-class-component";
 import GetUserInformationComponent from "@/components/GetUserInformationComponent.vue";
 
-export default Vue.extend({
+@Component({
   components: {
     GetUserInformationComponent
   }
-});
+})
+export default class HomeComponent extends Vue {}
 </script>

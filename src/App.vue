@@ -14,7 +14,7 @@
         </v-list-item>
         <v-list-item link>
           <v-list-item-action>
-            <v-icon>mdi-settings</v-icon>
+            <v-icon>mdi-cards-club</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Coming soon</v-list-item-title>
@@ -41,20 +41,22 @@
   </v-app>
 </template>
 
-<script>
-export default {
-  data: () => ({
-    drawer: null
-  }),
-  created() {
+<script lang="ts">
+import Vue from "vue";
+import Component from "vue-class-component";
+
+@Component
+export default class App extends Vue {
+  drawer = null;
+
+  created(): void {
     this.$vuetify.theme.dark = true;
-  },
-  methods: {
-    goTo(arg) {
-      if (this.$route.path !== `/${arg}`) {
-        this.$router.push(`/${arg}`);
-      }
+  }
+
+  goTo(arg: string): void {
+    if (this.$route.path !== `/${arg}`) {
+      this.$router.push(`/${arg}`);
     }
   }
-};
+}
 </script>
