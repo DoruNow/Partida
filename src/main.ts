@@ -7,12 +7,12 @@ import App from "./App.vue";
 import io from "socket.io-client";
 
 Vue.config.productionTip = false;
-const socket = io("http://localhost:3000");
+// const socket = io("http://localhost:3000");
 
 new Vue({
   router,
   vuetify,
   VueSocketIOExt,
-  socket,
+  // socket,
   render: h => h(App)
 }).$mount("#app");
