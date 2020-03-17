@@ -16,7 +16,7 @@ import HomeComponent from "@/components/HomeComponent.vue";
     HomeComponent
   }
 })
-export default class LicitatiiView extends Vue {
+export default class LicitatiiComponent extends Vue {
   get type() {
     return this.$route.path;
   }
