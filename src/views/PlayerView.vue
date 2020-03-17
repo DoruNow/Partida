@@ -34,16 +34,7 @@ export default class PlayerView extends Vue {
     { type: "Spades", value: 12 },
     { type: "Spades", value: 9 },
     { type: "Spades", value: 10 },
-    { type: "Hearts", value: 4 },
-    { type: "Spades", value: 8 },
-    { type: "Diamonds", value: 6 },
-    { type: "Spades", value: 1 },
-    { type: "Clubs", value: 13 },
-    { type: "Spades", value: 4 },
-    { type: "Hearts", value: 8 },
-    { type: "Hearts", value: 6 },
-    { type: "Spades", value: 3 },
-    { type: "Diamonds", value: 7 }
+    { type: "Hearts", value: 4 }
   ];
 }
 </script>
@@ -56,7 +47,7 @@ export default class PlayerView extends Vue {
   max-width: 100vw
   padding: 0
   display: grid
-  grid-template-rows: 20vh 20vh 60vh
+  grid-template-rows: 10vh 30vh 60vh
 
 .action-bar
   background-color: red
@@ -65,11 +56,12 @@ export default class PlayerView extends Vue {
   background-color: blue
   max-width: 100vw
   display: flex
+  flex: 1
   flex-direction: row
+  justify-content: center
 
 .card
   height: 100%
   background-color: green
   border: 1px solid black
-  max-width: 7.69vw
 </style>
