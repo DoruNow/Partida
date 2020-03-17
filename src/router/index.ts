@@ -18,13 +18,7 @@ const routes = [
   },
   {
     path: "/player",
-    component: PlayerView,
-    children: [
-      {
-        path: "test",
-        component: TestChildComponent
-      }
-    ]
+    component: PlayerView
   }
 ];
 
