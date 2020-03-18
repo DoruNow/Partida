@@ -1,6 +1,27 @@
 <template>
   <div class="container">
-    <div class="action-bar"></div>
+    <div class="action-bar">
+      <v-toolbar color="rgba(0,0,0,0)" flat>
+        <v-btn
+          v-if="admin"
+          class="mx-2"
+          small
+          fab
+          color="rgba(255,255,255,0.3)"
+          @click="resetHand(token)"
+          ><v-icon dark>mdi-undo</v-icon>
+        </v-btn>
+        <v-spacer></v-spacer>
+        <v-btn
+          class="mx-2"
+          small
+          fab
+          color="rgba(255,255,255,0.3)"
+          @click="addPoint(token)"
+          ><v-icon dark>mdi-plus</v-icon>
+        </v-btn>
+      </v-toolbar>
+    </div>
     <div></div>
     <div class="cards">
       <div class="card-list" v-for="card in cards" :key="card.id">
@@ -51,6 +72,9 @@ export default class PlayerView extends Vue {
     { type: "Hearts", value: 4 }
   ];
 
+  // user identification, probably socket ID
+  token = "";
+
   isCardSelected = false;
   selectedCard = {};
 
@@ -72,6 +96,15 @@ export default class PlayerView extends Vue {
     this.isCardSelected = true;
     this.selectedCard = card;
   }
+
+  // eslint-disable-next-line
+  addPoint(token) {
+    // send event to add point
+  }
+  // eslint-disable-next-line
+  resetHand(token) {
+    // send event to reset hand
+  }
 }
 </script>
 
@@ -85,11 +118,10 @@ export default class PlayerView extends Vue {
   display: grid
   grid-template-rows: 10vh 30vh 60vh
 
-.action-bar
-  background-color: red
+// .action-bar
+//   background-color: red
 
 .cards
-  background-color: blue
   max-width: 100vw
   display: flex
   flex: 1
@@ -98,7 +130,6 @@ export default class PlayerView extends Vue {
 
 .card-list
   height: 100%
-  background-color: green
 
 .card-button
   border: 1px solid black
