@@ -3,7 +3,6 @@ import VueRouter from "vue-router";
 import HomePageView from "@/views/HomePageView.vue";
 import PlayerView from "@/views/PlayerView.vue";
 import TestDeckComponent from "@/components/TestDeckComponent.vue";
-import TestChildComponent from "@/components/TestChildComponent.vue";
 
 Vue.use(VueRouter);
 

@@ -3,8 +3,22 @@
     <div class="action-bar"></div>
     <div></div>
     <div class="cards">
-      <div class="card" v-for="card in cards" :key="card.id">
-        {{ card }}
+      <div class="card-list" v-for="card in cards" :key="card.id">
+        <v-btn
+          depressed
+          large
+          dark
+          color="primary"
+          class="card-button"
+          v-show="!card.hide"
+          :class="
+            JSON.stringify(card) === JSON.stringify(selectedCard)
+              ? 'selected'
+              : ''
+          "
+          @click="setCardState(card)"
+          >{{ card.value }} {{ card.type }}</v-btn
+        >
       </div>
     </div>
   </div>
@@ -36,6 +50,28 @@ export default class PlayerView extends Vue {
     { type: "Spades", value: 10 },
     { type: "Hearts", value: 4 }
   ];
+
+  isCardSelected = false;
+  selectedCard = {};
+
+  setCardState(card) {
+    this.isCardSelected ? this.playCard(card) : this.selectCard(card);
+  }
+
+  playCard(card) {
+    if (JSON.stringify(card) === JSON.stringify(this.selectedCard)) {
+      this.isCardSelected = false;
+      this.selectedCard = {};
+      card.hide = true;
+    } else {
+      this.selectedCard = card;
+    }
+  }
+
+  selectCard(card) {
+    this.isCardSelected = true;
+    this.selectedCard = card;
+  }
 }
 </script>
 
@@ -60,8 +96,15 @@ export default class PlayerView extends Vue {
   flex-direction: row
   justify-content: center
 
-.card
+.card-list
   height: 100%
   background-color: green
+
+.card-button
   border: 1px solid black
+  height: 100% !important
+
+.selected
+  background-color: #000 !important
+  top: -20px
 </style>
