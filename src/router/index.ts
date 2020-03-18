@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import LicitatiiView from "@/views/LicitatiiView.vue";
+import HomePageView from "@/views/HomePageView.vue";
+import PlayerView from "@/views/PlayerView.vue";
 import TestDeckComponent from "@/components/TestDeckComponent.vue";
 
 Vue.use(VueRouter);
@@ -8,11 +9,15 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
-    component: LicitatiiView
+    component: HomePageView
   },
   {
     path: "/deck",
     component: TestDeckComponent
+  },
+  {
+    path: "/player",
+    component: PlayerView
   }
 ];
 
