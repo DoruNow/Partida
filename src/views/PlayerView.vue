@@ -110,7 +110,6 @@ export default class PlayerView extends Vue {
 
 <style lang="sass" scoped>
 .container
-  background-color: aquamarine
   width: 100vw
   height: 100vh
   max-width: 100vw
