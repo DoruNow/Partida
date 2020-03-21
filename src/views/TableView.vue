@@ -64,29 +64,25 @@ export default class TableView extends Vue {
   updateTablePayload = {
     cards: [
       {
-        playedBy: "P1",
         value: 12,
         type: "Diamonds"
       },
       {
-        playedBy: "",
         value: 13,
         type: "Hearts"
       },
       {
-        playedBy: "P3",
         value: 1,
         type: "Clubs"
       },
       {
-        playedBy: "P4",
         value: 12,
         type: "Spades"
       }
     ],
     gameScore: [1, 2],
     sessionScore: [1, 2],
-    players: ["P2", "P2", "P3", "P4"]
+    players: ["P1", "P2", "P3", "P4"]
   };
 }
 </script>
