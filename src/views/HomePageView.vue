@@ -10,6 +10,7 @@
             <v-list-item-title @click="goTo('')">Licitatii</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+
         <v-list-item link>
           <v-list-item-action>
             <v-icon>mdi-cards-club</v-icon>
@@ -20,6 +21,18 @@
             >
           </v-list-item-content>
         </v-list-item>
+
+        <v-list-item link>
+          <v-list-item-action>
+            <v-icon>mdi-cards-club</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title @click="goTo('table')"
+              >Go To Table Route</v-list-item-title
+            >
+          </v-list-item-content>
+        </v-list-item>
+
         <v-list-item link>
           <v-list-item-action>
             <v-icon>mdi-cards-club</v-icon>
@@ -58,7 +71,7 @@ import LicitatiiComponent from "@/components/LicitatiiComponent.vue";
 @Component({
   components: { LicitatiiComponent }
 })
-export default class App extends Vue {
+export default class HomePageView extends Vue {
   drawer = null;
 
   created(): void {

@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import HomePageView from "@/views/HomePageView.vue";
 import PlayerView from "@/views/PlayerView.vue";
+import TableView from "@/views/TableView.vue";
 import TestDeckComponent from "@/components/TestDeckComponent.vue";
 
 Vue.use(VueRouter);
@@ -18,6 +19,10 @@ const routes = [
   {
     path: "/player",
     component: PlayerView
+  },
+  {
+    path: "/table",
+    component: TableView
   }
 ];
 
