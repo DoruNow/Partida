@@ -87,7 +87,6 @@ export default class GetUserInformationComponent extends FormTypeProps {
 
   goToGame(): void {
     // TODO add real implementation
-    console.log(this.playerName);
   }
 }
 </script>

@@ -25,29 +25,25 @@
     <div></div>
     <div class="cards">
       <div class="card-list" v-for="card in cards" :key="card.id">
-        <v-btn
-          depressed
-          large
-          dark
-          color="primary"
-          class="card-button"
-          v-show="!card.hide"
+        <img
+          :src="playingCardMapper(card)"
           :class="
             JSON.stringify(card) === JSON.stringify(selectedCard)
               ? 'selected'
               : ''
           "
+          class="card"
+          v-show="!card.hide"
           @click="setCardState(card)"
-          >{{ card.value }} {{ card.type }}</v-btn
-        >
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
+import Component, { mixins } from "vue-class-component";
+import PlayingCardMapper from "@/mixins/PlayingCardMapper";
 
 @Component({
   props: {
@@ -63,13 +59,22 @@ import Component from "vue-class-component";
     }
   }
 })
-export default class PlayerView extends Vue {
+export default class PlayerView extends mixins(PlayingCardMapper) {
   // TODO remove test data
   cards = [
-    { type: "Spades", value: 12 },
-    { type: "Spades", value: 9 },
-    { type: "Spades", value: 10 },
-    { type: "Hearts", value: 4 }
+    { type: "Diamonds", value: 8 },
+    { type: "Spades", value: 4 },
+    { type: "Diamonds", value: 1 },
+    { type: "Clubs", value: 10 },
+    { type: "Diamonds", value: 6 },
+    { type: "Spades", value: 2 },
+    { type: "Spades", value: 5 },
+    { type: "Hearts", value: 8 },
+    { type: "Clubs", value: 1 },
+    { type: "Clubs", value: 3 },
+    { type: "Hearts", value: 1 },
+    { type: "Diamonds", value: 9 },
+    { type: "Diamonds", value: 10 }
   ];
 
   // user identification, probably socket ID
@@ -117,24 +122,17 @@ export default class PlayerView extends Vue {
   display: grid
   grid-template-rows: 10vh 30vh 60vh
 
-// .action-bar
-//   background-color: red
-
 .cards
   max-width: 100vw
-  display: flex
-  flex: 1
-  flex-direction: row
-  justify-content: center
 
 .card-list
-  height: 100%
+  width: 6vw
+  float: left
 
-.card-button
-  border: 1px solid black
-  height: 100% !important
+.card
+  height: 60vh
 
 .selected
-  background-color: #000 !important
+  position: relative
   top: -20px
 </style>

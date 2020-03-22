@@ -19,29 +19,25 @@
           class="card card1"
           :class="{ transparent: updateTablePayload.cards[0].value === 0 }"
         >
-          {{ updateTablePayload.cards[0].value
-          }}{{ updateTablePayload.cards[0].type }}
+          <img :src="playingCardMapper(updateTablePayload.cards[0])" alt="1" />
         </div>
         <div
           class="card card4"
           :class="{ transparent: updateTablePayload.cards[3].value === 0 }"
         >
-          {{ updateTablePayload.cards[3].value
-          }}{{ updateTablePayload.cards[3].type }}
+          <img :src="playingCardMapper(updateTablePayload.cards[3])" alt="1" />
         </div>
         <div
           class="card card3"
           :class="{ transparent: updateTablePayload.cards[2].value === 0 }"
         >
-          {{ updateTablePayload.cards[2].value
-          }}{{ updateTablePayload.cards[2].type }}
+          <img :src="playingCardMapper(updateTablePayload.cards[2])" alt="1" />
         </div>
         <div
           class="card card2"
           :class="{ transparent: updateTablePayload.cards[1].value === 0 }"
         >
-          {{ updateTablePayload.cards[1].value
-          }}{{ updateTablePayload.cards[1].type }}
+          <img :src="playingCardMapper(updateTablePayload.cards[1])" alt="1" />
         </div>
       </div>
     </div>
@@ -49,8 +45,8 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
+import Component, { mixins } from "vue-class-component";
+import PlayingCardMapper from "@/mixins/PlayingCardMapper";
 
 @Component({
   props: {
@@ -59,7 +55,7 @@ import Component from "vue-class-component";
     }
   }
 })
-export default class TableView extends Vue {
+export default class TableView extends mixins(PlayingCardMapper) {
   // TODO remove test data and update props
   updateTablePayload = {
     cards: [
@@ -68,7 +64,7 @@ export default class TableView extends Vue {
         type: "Diamonds"
       },
       {
-        value: 13,
+        value: 2,
         type: "Hearts"
       },
       {
@@ -115,13 +111,12 @@ export default class TableView extends Vue {
   background-color: #4900ff1f
   grid-area: player4
 .hand
-  background-color: #49001f1f
   grid-area: hand
   display: grid
   align-content: center
   justify-content: center
 .card
-  width: 12vh
+  width: 14vh
   height: 20vh
   background-color: #4900ff11
 .card1
@@ -142,4 +137,6 @@ export default class TableView extends Vue {
   left: 5vh
 .transparent
   opacity: 0
+img
+  width: 100%
 </style>
