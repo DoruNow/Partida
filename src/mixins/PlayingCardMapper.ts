@@ -26,7 +26,7 @@ export default class PlayingCardMapper extends Vue {
     }
 
     switch (card.value) {
-      case 1:
+      case 14:
         value = "ace";
         break;
       case 11:

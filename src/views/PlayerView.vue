@@ -24,7 +24,8 @@
     </div>
     <div></div>
     <div class="cards">
-      <div class="card-list" v-for="card in cards" :key="card.id">
+      <div class="card-list" v-for="card in orderedCards" :key="card.id">
+        <!-- {{ index }} -->
         <img
           :src="playingCardMapper(card)"
           :class="
@@ -44,6 +45,7 @@
 <script lang="ts">
 import Component, { mixins } from "vue-class-component";
 import PlayingCardMapper from "@/mixins/PlayingCardMapper";
+import DeckMixin from "../mixins/DeckMixin";
 
 @Component({
   props: {
@@ -59,22 +61,22 @@ import PlayingCardMapper from "@/mixins/PlayingCardMapper";
     }
   }
 })
-export default class PlayerView extends mixins(PlayingCardMapper) {
+export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   // TODO remove test data
   cards = [
     { type: "Diamonds", value: 8 },
     { type: "Spades", value: 4 },
-    { type: "Diamonds", value: 1 },
+    { type: "Diamonds", value: 13 },
     { type: "Clubs", value: 10 },
     { type: "Diamonds", value: 6 },
     { type: "Spades", value: 2 },
     { type: "Spades", value: 5 },
     { type: "Hearts", value: 8 },
-    { type: "Clubs", value: 1 },
+    { type: "Clubs", value: 2 },
     { type: "Clubs", value: 3 },
-    { type: "Hearts", value: 1 },
+    { type: "Hearts", value: 2 },
     { type: "Diamonds", value: 9 },
-    { type: "Diamonds", value: 10 }
+    { type: "Diamonds", value: 14 }
   ];
 
   // user identification, probably socket ID
@@ -82,6 +84,7 @@ export default class PlayerView extends mixins(PlayingCardMapper) {
 
   isCardSelected = false;
   selectedCard = {};
+  orderedCards = {};
 
   setCardState(card) {
     this.isCardSelected ? this.playCard(card) : this.selectCard(card);
@@ -100,6 +103,10 @@ export default class PlayerView extends mixins(PlayingCardMapper) {
   selectCard(card) {
     this.isCardSelected = true;
     this.selectedCard = card;
+  }
+
+  mounted() {
+    this.orderedCards = this.orderCardsInHand(this.cards);
   }
 
   // eslint-disable-next-line
@@ -130,7 +137,8 @@ export default class PlayerView extends mixins(PlayingCardMapper) {
   float: left
 
 .card
-  height: 60vh
+  height: 60vhorderedCards
+  top: -20px
 
 .selected
   position: relative
