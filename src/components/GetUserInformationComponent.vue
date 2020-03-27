@@ -12,8 +12,8 @@
         class="pa-2"
       >
         <v-text-field
-          v-model="playerName"
-          name="playerName"
+          v-model="userName"
+          name="userName"
           label="Player Name"
           type="text"
           @keydown.space.prevent
@@ -35,7 +35,7 @@
           item-value="value"
         ></v-select>
         <v-btn :disabled="!settingsForm" color="success" @click="goToGame"
-          >Log the data</v-btn
+          >Host Game</v-btn
         >
       </v-form>
     </v-card>
@@ -45,6 +45,15 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
+import axios from "axios";
+
+interface AccessControl {
+  data: {
+    accessControl: {
+      isAllowed: boolean;
+    };
+  };
+}
 
 const FormTypeProps = Vue.extend({
   props: {
@@ -61,7 +70,7 @@ export default class GetUserInformationComponent extends FormTypeProps {
   showIfJoinGame = false;
   showForm = false;
   settingsForm = null;
-  playerName = "Doru";
+  userName = "Doru";
   roomName = "KingPin";
   playerSelection = [
     { text: "Player 2", value: 2 },
@@ -85,8 +94,18 @@ export default class GetUserInformationComponent extends FormTypeProps {
     }
   }
 
-  goToGame(): void {
-    // TODO add real implementation
+  goToGame() {
+    axios
+      .post("/", {
+        userName: this.userName,
+        roomName: this.roomName
+      })
+      .then((response: any) => {
+        const { data } = response;
+        response.accessControl.isAllowed
+          ? this.$router.push("/player")
+          : console.log("Authorization failed");
+      });
   }
 }
 </script>

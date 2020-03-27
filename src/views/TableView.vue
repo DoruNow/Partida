@@ -64,11 +64,11 @@ export default class TableView extends mixins(PlayingCardMapper) {
         type: "Diamonds"
       },
       {
-        value: 2,
+        value: 11,
         type: "Hearts"
       },
       {
-        value: 1,
+        value: 14,
         type: "Clubs"
       },
       {
