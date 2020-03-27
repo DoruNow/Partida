@@ -68,11 +68,11 @@ export default class TableView extends Vue {
         type: "Diamonds"
       },
       {
-        value: 13,
+        value: 11,
         type: "Hearts"
       },
       {
-        value: 1,
+        value: 14,
         type: "Clubs"
       },
       {
