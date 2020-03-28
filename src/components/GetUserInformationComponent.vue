@@ -45,7 +45,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import axios from "axios";
+import http from "../plugins/axios";
 
 interface AccessControl {
   data: {
@@ -95,14 +95,14 @@ export default class GetUserInformationComponent extends FormTypeProps {
   }
 
   goToGame() {
-    axios
+    http
       .post("/", {
         userName: this.userName,
         roomName: this.roomName
       })
       .then((response: any) => {
         const { data } = response;
-        response.accessControl.isAllowed
+        data.accessControl.isAllowed
           ? this.$router.push("/player")
           : console.log("Authorization failed");
       });

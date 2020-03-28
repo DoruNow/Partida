@@ -2,6 +2,9 @@
   <div class="container">
     <div class="action-bar">
       <v-toolbar color="rgba(0,0,0,0)" flat>
+        <v-btn block color="primary" dark @click="startGame()"
+          >Start Game</v-btn
+        >
         <v-btn
           v-if="admin"
           class="mx-2"
@@ -46,6 +49,7 @@
 import Component, { mixins } from "vue-class-component";
 import PlayingCardMapper from "@/mixins/PlayingCardMapper";
 import DeckMixin from "../mixins/DeckMixin";
+import http from "../plugins/axios";
 
 @Component({
   props: {
@@ -63,21 +67,21 @@ import DeckMixin from "../mixins/DeckMixin";
 })
 export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   // TODO remove test data
-  cards = [
-    { type: "Diamonds", value: 8 },
-    { type: "Spades", value: 4 },
-    { type: "Diamonds", value: 13 },
-    { type: "Clubs", value: 10 },
-    { type: "Diamonds", value: 6 },
-    { type: "Spades", value: 2 },
-    { type: "Spades", value: 5 },
-    { type: "Hearts", value: 8 },
-    { type: "Clubs", value: 2 },
-    { type: "Clubs", value: 3 },
-    { type: "Hearts", value: 2 },
-    { type: "Diamonds", value: 9 },
-    { type: "Diamonds", value: 14 }
-  ];
+  // cards = [
+  //   { type: "Diamonds", value: 8 },
+  //   { type: "Spades", value: 4 },
+  //   { type: "Diamonds", value: 13 },
+  //   { type: "Clubs", value: 10 },
+  //   { type: "Diamonds", value: 6 },
+  //   { type: "Spades", value: 2 },
+  //   { type: "Spades", value: 5 },
+  //   { type: "Hearts", value: 8 },
+  //   { type: "Clubs", value: 2 },
+  //   { type: "Clubs", value: 3 },
+  //   { type: "Hearts", value: 2 },
+  //   { type: "Diamonds", value: 9 },
+  //   { type: "Diamonds", value: 14 }
+  // ];
 
   // user identification, probably socket ID
   token = "";
@@ -106,7 +110,16 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   }
 
   mounted() {
-    this.orderedCards = this.orderCardsInHand(this.cards);
+    http.get("/access-control/player").then(response => {
+      if (!response.data.accessControl.isAllowed) {
+        this.$router.push("/");
+      }
+    });
+    // this.orderedCards = this.orderCardsInHand(this.cards);
+  }
+
+  startGame() {
+    this.$socket.client.emit("start_game", {});
   }
 
   // eslint-disable-next-line
