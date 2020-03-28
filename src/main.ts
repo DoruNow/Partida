@@ -4,7 +4,7 @@ import vuetify from "./plugins/vuetify";
 import VueSocketIOExt from "vue-socket.io-extended";
 
 import App from "./App.vue";
-import io from "socket.io-client";
+// import io from "socket.io-client";
 
 Vue.config.productionTip = false;
 // const socket = io("http://localhost:3000");
