@@ -13,6 +13,7 @@
     <div class="player4" v-if="updateTablePayload.players[3] !== ''">
       {{ updateTablePayload.players[3] }}
     </div>
+    {{ updateTablePayload.cards }}
     <div class="hand">
       <div>
         <div
@@ -47,6 +48,7 @@
 <script lang="ts">
 import Component, { mixins } from "vue-class-component";
 import PlayingCardMapper from "@/mixins/PlayingCardMapper";
+import http from "../plugins/axios";
 
 @Component({
   props: {
@@ -77,9 +79,21 @@ export default class TableView extends mixins(PlayingCardMapper) {
       }
     ],
     gameScore: [1, 2],
-    sessionScore: [1, 2],
+    generalScore: [1, 2],
     players: ["P1", "P2", "P3", "P4"]
   };
+
+  mounted() {
+    this.$socket.client.emit("join_room", {});
+    http.post("/", {
+      userName: "masa",
+      roomName: "kingpin"
+    });
+    this.$socket.client.on("update_table", data => {
+      console.log(data);
+      this.updateTablePayload = data;
+    });
+  }
 }
 </script>
 

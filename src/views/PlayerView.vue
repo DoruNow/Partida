@@ -2,7 +2,12 @@
   <div class="container">
     <div class="action-bar">
       <v-toolbar color="rgba(0,0,0,0)" flat>
-        <v-btn block color="primary" dark @click="startGame()"
+        <v-btn
+          block
+          color="primary"
+          dark
+          @click="startGame()"
+          v-if="!gameHasStarted"
           >Start Game</v-btn
         >
         <v-btn
@@ -14,6 +19,7 @@
           @click="resetHand(token)"
           ><v-icon dark>mdi-undo</v-icon>
         </v-btn>
+
         <v-spacer></v-spacer>
         <v-btn
           class="mx-2"
@@ -28,7 +34,6 @@
     <div></div>
     <div class="cards">
       <div class="card-list" v-for="card in orderedCards" :key="card.id">
-        <!-- {{ index }} -->
         <img
           :src="playingCardMapper(card)"
           :class="
@@ -48,15 +53,11 @@
 <script lang="ts">
 import Component, { mixins } from "vue-class-component";
 import PlayingCardMapper from "@/mixins/PlayingCardMapper";
-import DeckMixin from "../mixins/DeckMixin";
+import DeckMixin, { Card } from "../mixins/DeckMixin";
 import http from "../plugins/axios";
 
 @Component({
   props: {
-    // TODO rename to `cards`
-    cards1: {
-      type: Object
-    },
     admin: {
       type: Boolean
     },
@@ -66,29 +67,10 @@ import http from "../plugins/axios";
   }
 })
 export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
-  // TODO remove test data
-  // cards = [
-  //   { type: "Diamonds", value: 8 },
-  //   { type: "Spades", value: 4 },
-  //   { type: "Diamonds", value: 13 },
-  //   { type: "Clubs", value: 10 },
-  //   { type: "Diamonds", value: 6 },
-  //   { type: "Spades", value: 2 },
-  //   { type: "Spades", value: 5 },
-  //   { type: "Hearts", value: 8 },
-  //   { type: "Clubs", value: 2 },
-  //   { type: "Clubs", value: 3 },
-  //   { type: "Hearts", value: 2 },
-  //   { type: "Diamonds", value: 9 },
-  //   { type: "Diamonds", value: 14 }
-  // ];
-
-  // user identification, probably socket ID
-  token = "";
-
+  gameHasStarted = false;
   isCardSelected = false;
-  selectedCard = {};
-  orderedCards = {};
+  selectedCard: Card = { value: 0, type: "" };
+  orderedCards = [];
 
   setCardState(card) {
     this.isCardSelected ? this.playCard(card) : this.selectCard(card);
@@ -97,8 +79,9 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   playCard(card) {
     if (JSON.stringify(card) === JSON.stringify(this.selectedCard)) {
       this.isCardSelected = false;
-      this.selectedCard = {};
+      this.selectedCard = { value: 0, type: "" };
       card.hide = true;
+      this.$socket.client.emit("play_card", card);
     } else {
       this.selectedCard = card;
     }
@@ -109,13 +92,18 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
     this.selectedCard = card;
   }
 
-  mounted() {
-    http.get("/access-control/player").then(response => {
+  async mounted() {
+    await http.get("/access-control/player").then(response => {
       if (!response.data.accessControl.isAllowed) {
         this.$router.push("/");
+      } else {
+        this.$socket.client.emit("join_room", {});
+        this.$socket.client.on("update_player", data => {
+          this.orderedCards = this.orderCardsInHand(data.cards);
+          this.gameHasStarted = true;
+        });
       }
     });
-    // this.orderedCards = this.orderCardsInHand(this.cards);
   }
 
   startGame() {
