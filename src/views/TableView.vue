@@ -1,45 +1,24 @@
 <template>
   <div class="container">
-    <div class="score-bar">Score Bar</div>
-    <div class="player1" v-if="updateTablePayload.players[0] !== ''">
-      {{ updateTablePayload.players[0] }}
+    <div class="score-bar"></div>
+    <div
+      v-for="player in updateTablePayload.players"
+      :key="player.id"
+      :class="'player' + player.id"
+    >
+      {{ player.playerName }}
     </div>
-    <div class="player2" v-if="updateTablePayload.players[1] !== ''">
-      {{ updateTablePayload.players[1] }}
-    </div>
-    <div class="player3" v-if="updateTablePayload.players[2] !== ''">
-      {{ updateTablePayload.players[2] }}
-    </div>
-    <div class="player4" v-if="updateTablePayload.players[3] !== ''">
-      {{ updateTablePayload.players[3] }}
-    </div>
-    {{ updateTablePayload.cards }}
     <div class="hand">
-      <div>
-        <div
-          class="card card1"
-          :class="{ transparent: updateTablePayload.cards[0].value === 0 }"
-        >
-          <img :src="playingCardMapper(updateTablePayload.cards[0])" alt="1" />
-        </div>
-        <div
-          class="card card4"
-          :class="{ transparent: updateTablePayload.cards[3].value === 0 }"
-        >
-          <img :src="playingCardMapper(updateTablePayload.cards[3])" alt="1" />
-        </div>
-        <div
-          class="card card3"
-          :class="{ transparent: updateTablePayload.cards[2].value === 0 }"
-        >
-          <img :src="playingCardMapper(updateTablePayload.cards[2])" alt="1" />
-        </div>
-        <div
-          class="card card2"
-          :class="{ transparent: updateTablePayload.cards[1].value === 0 }"
-        >
-          <img :src="playingCardMapper(updateTablePayload.cards[1])" alt="1" />
-        </div>
+      <div
+        class="card"
+        v-for="(card, index) in updateTablePayload.cards"
+        :key="card.id"
+        :class="'card' + index"
+      >
+        <img
+          :src="playingCardMapper(updateTablePayload.cards[index])"
+          alt="1"
+        />
       </div>
     </div>
   </div>
@@ -47,51 +26,29 @@
 
 <script lang="ts">
 import Component, { mixins } from "vue-class-component";
-import PlayingCardMapper from "@/mixins/PlayingCardMapper";
+import PlayingCardMapper from "../mixins/PlayingCardMapper";
 import http from "../plugins/axios";
 
-@Component({
-  props: {
-    updateTablePayload1: {
-      type: Object
-    }
-  }
-})
+@Component
 export default class TableView extends mixins(PlayingCardMapper) {
   // TODO remove test data and update props
-  updateTablePayload = {
-    cards: [
-      {
-        value: 12,
-        type: "Diamonds"
-      },
-      {
-        value: 11,
-        type: "Hearts"
-      },
-      {
-        value: 14,
-        type: "Clubs"
-      },
-      {
-        value: 12,
-        type: "Spades"
-      }
-    ],
-    gameScore: [1, 2],
-    generalScore: [1, 2],
-    players: ["P1", "P2", "P3", "P4"]
-  };
+  card = {};
+  index = 0;
+  updateTablePayload = { cards: [], players: [] };
 
   mounted() {
-    this.$socket.client.emit("join_room", {});
     http.post("/", {
       userName: "masa",
-      roomName: "kingpin"
+      roomName: "kingpin",
     });
-    this.$socket.client.on("update_table", data => {
+
+    this.$socket.client.on("update_table", (data) => {
       console.log(data);
-      this.updateTablePayload = data;
+      console.log(this.updateTablePayload.players);
+      if (data.cards) {
+        this.updateTablePayload.cards.push(data.cards);
+      }
+      this.updateTablePayload.players.push(data.player);
     });
   }
 }
@@ -110,7 +67,6 @@ export default class TableView extends mixins(PlayingCardMapper) {
   height: 100vh
   padding: 0
 .score-bar
-  background-color: #4900ff10
   grid-area: score-bar
 .player1
   background-color: #4900ff1f
@@ -127,30 +83,24 @@ export default class TableView extends mixins(PlayingCardMapper) {
 .hand
   grid-area: hand
   display: grid
-  align-content: center
-  justify-content: center
+  grid-template-columns: auto 12fr 2fr 10fr 2fr 10fr 2fr 12fr auto
+  grid-template-rows: auto 9fr 8fr 2fr 8fr 9fr auto
 .card
   width: 14vh
   height: 20vh
   background-color: #4900ff11
+.card0
+  grid-column: 3 / 5
+  grid-row: 3 / 5
 .card1
-  position: relative
-  right: 15vh
-  top: 30vh
+  grid-column: 5 / 7
+  grid-row: 4 / 6
 .card2
-  position: relative
-  top: -22vh
-  right: 5vh
+  grid-column: 7 / 8
+  grid-row: 3 / 5
 .card3
-  position: relative
-  left: 15vh
-  top: -10vh
-.card4
-  position: relative
-  top: 2vh
-  left: 5vh
-.transparent
-  opacity: 0
+  grid-column: 5 / 7
+  grid-row: 2 / 4
 img
   width: 100%
 </style>

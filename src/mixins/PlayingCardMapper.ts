@@ -39,6 +39,7 @@ export default class PlayingCardMapper extends Vue {
         value = "king";
         break;
       default:
+        console.log(value);
         value = card.value.toString();
     }
 

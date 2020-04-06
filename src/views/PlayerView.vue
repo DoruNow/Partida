@@ -3,15 +3,14 @@
     <div class="action-bar">
       <v-toolbar color="rgba(0,0,0,0)" flat>
         <v-btn
-          block
-          color="primary"
-          dark
           @click="startGame()"
           v-if="!gameHasStarted"
+          color="rgba(255,255,255,0.3)"
           >Start Game</v-btn
         >
+
+        <v-spacer></v-spacer>
         <v-btn
-          v-if="admin"
           class="mx-2"
           small
           fab
@@ -19,8 +18,6 @@
           @click="resetHand(token)"
           ><v-icon dark>mdi-undo</v-icon>
         </v-btn>
-
-        <v-spacer></v-spacer>
         <v-btn
           class="mx-2"
           small
@@ -52,7 +49,7 @@
 
 <script lang="ts">
 import Component, { mixins } from "vue-class-component";
-import PlayingCardMapper from "@/mixins/PlayingCardMapper";
+import PlayingCardMapper from "../mixins/PlayingCardMapper";
 import DeckMixin, { Card } from "../mixins/DeckMixin";
 import http from "../plugins/axios";
 
@@ -94,7 +91,7 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
 
   async mounted() {
     await http.get("/access-control/player").then(response => {
-      if (!response.data.accessControl.isAllowed) {
+      if (!response.data.accessControl.isAuthorized) {
         this.$router.push("/");
       } else {
         this.$socket.client.emit("join_room", {});

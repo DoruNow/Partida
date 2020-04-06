@@ -34,9 +34,9 @@
           label="Select Player"
           item-value="value"
         ></v-select>
-        <v-btn :disabled="!settingsForm" color="success" @click="goToGame"
-          >Host Game</v-btn
-        >
+        <v-btn :disabled="!settingsForm" color="success" @click="goToGame">{{
+          submitMenuCardButtonText
+        }}</v-btn>
       </v-form>
     </v-card>
   </div>
@@ -50,7 +50,7 @@ import http from "../plugins/axios";
 interface AccessControl {
   data: {
     accessControl: {
-      isAllowed: boolean;
+      isAuthorized: boolean;
     };
   };
 }
@@ -58,9 +58,9 @@ interface AccessControl {
 const FormTypeProps = Vue.extend({
   props: {
     formType: {
-      type: String
-    }
-  }
+      type: String,
+    },
+  },
 });
 
 @Component
@@ -72,37 +72,41 @@ export default class GetUserInformationComponent extends FormTypeProps {
   settingsForm = null;
   userName = "Doru";
   roomName = "KingPin";
+  submitMenuCardButtonText = "";
   playerSelection = [
     { text: "Player 2", value: 2 },
     { text: "Player 3", value: 3 },
-    { text: "Player 4", value: 4 }
+    { text: "Player 4", value: 4 },
   ];
   required = [(v: object | string) => !!v || "Required field"];
   settings = {
-    roomName: String
+    roomName: String,
   };
 
   mounted() {
-    this.select = { value: null };
-
     if (this.formType === "start") {
       this.menuCardButtonText = "Host Game";
-      this.select = { value: 1 };
+      this.submitMenuCardButtonText = "Start";
+      this.select = 1;
     } else if (this.formType === "join") {
       this.menuCardButtonText = "Join Game";
+      this.submitMenuCardButtonText = "Join";
       this.showIfJoinGame = true;
     }
   }
 
   goToGame() {
+    console.log(this.select);
+
     http
       .post("/", {
         userName: this.userName,
-        roomName: this.roomName
+        roomName: this.roomName,
+        playerNumber: this.select,
       })
       .then((response: any) => {
         const { data } = response;
-        data.accessControl.isAllowed
+        data.accessControl.isAuthorized
           ? this.$router.push("/player")
           : console.log("Authorization failed");
       });
