@@ -17,10 +17,5 @@ export default class TestDeckComponent extends mixins(
   PlayingCardMapper
 ) {
   deck = {};
-
-  created() {
-    this.deck = this.dealCards();
-    console.log(this.deck);
-  }
 }
 </script>
