@@ -1,14 +1,9 @@
 <template>
-  <div>
-    <v-btn color="success" @click="getRealTimeData">Connect</v-btn
-    >{{ allFetchedData }}
-  </div>
+  <div><v-btn @click="getRealTimeData">Connect</v-btn>{{ allFetchedData }}</div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import io from "socket.io-client";
-const socket = io.connect("http://localhost:3000");
 
 export default Vue.extend({
   name: "HelloWorld",
@@ -20,9 +15,7 @@ export default Vue.extend({
   },
   methods: {
     getRealTimeData() {
-      socket.on("newdata", (fetchedData: string) => {
-        this.allFetchedData.push(fetchedData);
-      });
+      this.$socket.client.emit("createRoom", { playerName: "a" });
     }
   }
 });

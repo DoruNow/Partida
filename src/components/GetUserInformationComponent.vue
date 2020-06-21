@@ -1,9 +1,9 @@
 <template>
   <div class="d-flex justify-center align-center flex-column">
     <v-card class="ma-3">
-      <v-btn class="ma-2" color="success" @click="showForm = !showForm" large>{{
-        menuCardButtonText
-      }}</v-btn>
+      <v-btn class="ma-2" color="success" @click="showForm = !showForm" large>
+        {{ menuCardButtonText }}
+      </v-btn>
       <v-form
         v-show="showForm"
         v-model="settingsForm"
@@ -27,66 +27,98 @@
           @keydown.space.prevent
           :rules="required"
         ></v-text-field>
+        <v-text-field
+          v-model="pin"
+          name="pin"
+          label="Pin"
+          placeholder="****"
+          type="number"
+          :rules="required"
+        ></v-text-field>
         <v-select
-          v-if="showIfJoinGame"
+          v-if="showJoinGame"
           v-model="select"
           :items="playerSelection"
           label="Select Player"
           item-value="value"
+          :rules="required"
         ></v-select>
-        <v-btn :disabled="!settingsForm" color="success" @click="goToGame"
-          >Log the data</v-btn
-        >
+        <!-- add text tag for errors coming from backend -->
+        <v-btn :disabled="!settingsForm" color="success" @click="goToGame">
+          {{ formType }}
+        </v-btn>
       </v-form>
     </v-card>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-
-const FormTypeProps = Vue.extend({
-  props: {
-    formType: {
-      type: String
-    }
-  }
-});
+import { Vue, Component, Prop } from "vue-property-decorator";
 
 @Component
-export default class GetUserInformationComponent extends FormTypeProps {
-  select = {};
+export default class GetUserInformationComponent extends Vue {
+  @Prop(String) readonly formType: "start" | "join";
+
+  select = null;
+  pin = 1091;
   menuCardButtonText = "";
-  showIfJoinGame = false;
+  showJoinGame = false;
   showForm = false;
   settingsForm = null;
-  playerName = "Doru";
-  roomName = "KingPin";
+  playerName = "doruletPlayer";
+  roomName = "danus";
   playerSelection = [
-    { text: "Player 2", value: 2 },
-    { text: "Player 3", value: 3 },
-    { text: "Player 4", value: 4 }
+    { text: "Player 2", value: 1 },
+    { text: "Player 3", value: 2 },
+    { text: "Player 4", value: 3 }
   ];
-  required = [(v: object | string) => !!v || "Required field"];
+  required = [v => !!v || "Required field"];
   settings = {
     roomName: String
   };
 
   mounted() {
-    this.select = { value: null };
-
     if (this.formType === "start") {
       this.menuCardButtonText = "Host Game";
-      this.select = { value: 1 };
     } else if (this.formType === "join") {
       this.menuCardButtonText = "Join Game";
-      this.showIfJoinGame = true;
+      this.showJoinGame = true;
     }
   }
 
   goToGame(): void {
-    // TODO add real implementation
+    // @ts-ignore
+    this.$socket.$subscribe("catchError", data => console.log(data));
+    if (this.formType === "start") {
+      // @ts-ignore
+      this.$socket.client.emit("createRoom", {
+        roomName: this.roomName,
+        playerName: this.playerName,
+        pin: this.pin
+      });
+
+      // @ts-ignore
+      this.$socket.$subscribe("roomCreated", data => {
+        if (data) {
+          this.$router.push("/player").catch(err => err);
+        }
+      });
+    } else if (this.formType === "join") {
+      // @ts-ignore
+      this.$socket.client.emit("joinRoom", {
+        roomName: this.roomName,
+        playerName: this.playerName,
+        pin: this.pin,
+        playerNo: this.select.value
+      });
+
+      // @ts-ignore
+      this.$socket.$subscribe("connectToRoom", data => {
+        if (data) {
+          this.$router.push("/player").catch(err => err);
+        }
+      });
+    }
   }
 }
 </script>

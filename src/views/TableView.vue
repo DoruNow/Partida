@@ -46,16 +46,12 @@
 
 <script lang="ts">
 import Component, { mixins } from "vue-class-component";
-import PlayingCardMapper from "@/mixins/PlayingCardMapper";
+import PlayingCardMapper from "../mixins/PlayingCardMapper";
+import { Prop } from "vue-property-decorator";
 
-@Component({
-  props: {
-    updateTablePayload1: {
-      type: Object
-    }
-  }
-})
+@Component
 export default class TableView extends mixins(PlayingCardMapper) {
+  @Prop(Object) readonly updateTablePayload1;
   // TODO remove test data and update props
   updateTablePayload = {
     cards: [
@@ -68,7 +64,7 @@ export default class TableView extends mixins(PlayingCardMapper) {
         type: "Hearts"
       },
       {
-        value: 1,
+        value: 14,
         type: "Clubs"
       },
       {
