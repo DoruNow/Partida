@@ -1,18 +1,20 @@
 import Vue from "vue";
 import router from "./router";
 import vuetify from "./plugins/vuetify";
-import VueSocketIOExt from "vue-socket.io-extended";
+import VueSocketIO from "vue-socket.io-extended";
+import io from "socket.io-client";
 
+// @ts-ignore
 import App from "./App.vue";
-// import io from "socket.io-client";
 
 Vue.config.productionTip = false;
-// const socket = io("http://localhost:3000");
+const socket = io("http://localhost:3000");
 
+Vue.use(VueSocketIO, socket);
 new Vue({
   router,
+  // @ts-ignore
   vuetify,
-  VueSocketIOExt,
-  // socket,
+  socket,
   render: h => h(App)
 }).$mount("#app");
