@@ -15,6 +15,5 @@ new Vue({
   router,
   // @ts-ignore
   vuetify,
-  socket,
   render: h => h(App)
 }).$mount("#app");

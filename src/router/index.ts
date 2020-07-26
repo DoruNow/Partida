@@ -22,11 +22,11 @@ const routes = [
     component: TestSocketComponent
   },
   {
-    path: "/player",
+    path: "/player/:position/:roomName",
     component: PlayerView
   },
   {
-    path: "/table",
+    path: "/table/:roomName",
     component: TableView
   }
 ];

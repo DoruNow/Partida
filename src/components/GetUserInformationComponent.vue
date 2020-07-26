@@ -100,7 +100,7 @@ export default class GetUserInformationComponent extends Vue {
       // @ts-ignore
       this.$socket.$subscribe("roomCreated", data => {
         if (data) {
-          this.$router.push("/player").catch(err => err);
+          this.$router.push(`/player/0/${this.roomName}`).catch(err => err);
         }
       });
     } else if (this.formType === "join") {
@@ -109,13 +109,18 @@ export default class GetUserInformationComponent extends Vue {
         roomName: this.roomName,
         playerName: this.playerName,
         pin: this.pin,
-        playerNo: this.select.value
+        position: this.select
       });
+      this.$router
+        .push(`/player/${this.select}/${this.roomName}`)
+        .catch(err => err);
 
       // @ts-ignore
       this.$socket.$subscribe("connectToRoom", data => {
         if (data) {
-          this.$router.push("/player").catch(err => err);
+          this.$router
+            .push(`/player/${this.select}/${this.roomName}`)
+            .catch(err => err);
         }
       });
     }
