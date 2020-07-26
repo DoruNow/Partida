@@ -135,6 +135,8 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   }
 
   restartGame() {
+    this.startGame();
+
     localStorage.position = undefined;
     localStorage.roomName = undefined;
   }
