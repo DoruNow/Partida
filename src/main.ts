@@ -9,6 +9,7 @@ import App from "./App.vue";
 
 Vue.config.productionTip = false;
 const socket = io("http://localhost:3000");
+// Vue.config.silent = true;
 
 Vue.use(VueSocketIO, socket);
 new Vue({

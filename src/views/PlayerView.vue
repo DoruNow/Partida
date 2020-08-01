@@ -53,16 +53,40 @@
 import Component, { mixins } from "vue-class-component";
 import PlayingCardMapper from "../mixins/PlayingCardMapper";
 import DeckMixin from "../mixins/DeckMixin";
-import { Prop } from "vue-property-decorator";
 
 @Component
 export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   isCardSelected = false;
   selectedCard = {};
   orderedCards = {};
-  cards = null;
   position = null;
   roomName = null;
+  cards = null;
+
+  mounted() {
+    this.position = this.$route.params.position;
+    this.roomName = this.$route.params.roomName;
+    // The user goes to an existing game when route params match
+    // local storage params
+    if (
+      localStorage.position === this.position &&
+      localStorage.roomName === this.roomName
+    ) {
+      // @ts-ignore
+      this.$socket.client.emit("reloadGame", {
+        roomName: this.roomName,
+        position: this.position
+      });
+    } else {
+      localStorage.position = this.position;
+      localStorage.roomName = this.roomName;
+    }
+    // TODO remove
+    // @ts-ignore
+    this.$socket.client.on("connectToRoom", data => console.log(data));
+    // @ts-ignore
+    this.$socket.client.on("catchError", data => console.log(data));
+  }
 
   setCardState(card) {
     this.isCardSelected ? this.playCard(card) : this.selectCard(card);
@@ -87,37 +111,12 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
     this.selectedCard = card;
   }
 
-  mounted() {
-    this.position = this.$route.params.position;
-    this.roomName = this.$route.params.roomName;
-    // The user goes to an existing game when route params match
-    // local storage params
-    if (
-      localStorage.position === this.position &&
-      localStorage.roomName === this.roomName
-    ) {
-      // @ts-ignore
-      this.$socket.client.emit("reloadGame", {
-        roomName: this.roomName,
-        position: this.position
-      });
-    } else {
-      localStorage.position = this.position;
-      localStorage.roomName = this.roomName;
-    }
-
-    // @ts-ignore
-    this.$socket.client.on("connectToRoom", data => console.log(data));
-    // @ts-ignore
-    this.$socket.client.on("catchError", data => console.log(data));
-  }
-
   startGame() {
     // @ts-ignore
     this.$socket.client.emit("startGame", { roomName: this.roomName });
     // @ts-ignore
     this.$socket.client.on("startGame", data => {
-      this.cards = data.players[this.position].cards;
+      this.cards = this.orderCardsInHand(data.players[this.position].cards);
     });
   }
 

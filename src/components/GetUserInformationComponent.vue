@@ -87,6 +87,7 @@ export default class GetUserInformationComponent extends Vue {
   }
 
   goToGame(): void {
+    this.dropDb();
     // @ts-ignore
     this.$socket.$subscribe("catchError", data => console.log(data));
     if (this.formType === "start") {
@@ -124,6 +125,10 @@ export default class GetUserInformationComponent extends Vue {
         }
       });
     }
+  }
+  dropDb() {
+    // @ts-ignore
+    this.$socket.client.emit("dropDb");
   }
 }
 </script>
