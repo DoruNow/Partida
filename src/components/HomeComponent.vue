@@ -14,8 +14,8 @@ import GetUserInformationComponent from "@/components/GetUserInformationComponen
 
 @Component({
   components: {
-    GetUserInformationComponent
-  }
+    GetUserInformationComponent,
+  },
 })
 export default class HomeComponent extends Vue {
   dropDb() {
@@ -24,36 +24,44 @@ export default class HomeComponent extends Vue {
   }
 
   createTestRoom() {
+    this.dropDb();
     // @ts-ignore
     this.$socket.client.emit("createRoom", {
       roomName: "testRoom",
       playerName: "Player 1",
       pin: 1091,
-      playerId: 0
+      playerId: 0,
     });
-    // @ts-ignore
-    this.$socket.client.emit("joinRoom", {
-      roomName: "testRoom",
-      playerName: "Player 2",
-      pin: 1091,
-      playerId: 1
-    });
-    // @ts-ignore
-    this.$socket.client.emit("joinRoom", {
-      roomName: "testRoom",
-      playerName: "Player 3",
-      pin: 1091,
-      playerId: 2
-    });
-    // @ts-ignore
-    this.$socket.client.emit("joinRoom", {
-      roomName: "testRoom",
-      playerName: "Player 4",
-      pin: 1091,
-      playerId: 3
-    });
+    setTimeout(() => {
+      // @ts-ignore
+      this.$socket.client.emit("joinRoom", {
+        roomName: "testRoom",
+        playerName: "Player 2",
+        pin: 1091,
+        playerId: 1,
+      });
+    }, 200);
 
-    this.$router.push("/player/0/testRoom").catch(err => err);
+    setTimeout(() => {
+      // @ts-ignore
+      this.$socket.client.emit("joinRoom", {
+        roomName: "testRoom",
+        playerName: "Player 3",
+        pin: 1091,
+        playerId: 2,
+      });
+    }, 400);
+
+    setTimeout(() => {
+      // @ts-ignore
+      this.$socket.client.emit("joinRoom", {
+        roomName: "testRoom",
+        playerName: "Player 4",
+        pin: 1091,
+        playerId: 3,
+      });
+      this.$router.push("/player/0/testRoom").catch((err) => err);
+    }, 600);
   }
 }
 </script>

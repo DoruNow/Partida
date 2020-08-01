@@ -16,7 +16,7 @@
           big
           color="rgba(255,255,255,0.3)"
           @click="startGame()"
-          >{{ isDisabled }}
+          >Start game
         </v-btn>
         <v-spacer></v-spacer>
         <v-btn
@@ -92,9 +92,9 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
 
     // TODO remove
     // @ts-ignore
-    this.$socket.client.on("connectToRoom", data => console.log(data));
+    this.$socket.client.on("connectToRoom", (data) => console.log(data));
     // @ts-ignore
-    this.$socket.client.on("catchError", data => console.log(data));
+    this.$socket.client.on("catchError", (data) => console.log(data));
   }
 
   setIsDisabled() {
@@ -112,7 +112,8 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
       card.hide = true;
       // @ts-ignore
       this.$socket.client.emit("playCard", {
-        card
+        card,
+        roomName: this.roomName,
       });
     } else {
       this.selectedCard = card;
@@ -128,9 +129,12 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
     // @ts-ignore
     this.$socket.client.emit("startGame", { roomName: this.roomName });
     // @ts-ignore
-    this.$socket.client.on("startGame", data => {
-      this.cards = this.orderCardsInHand(data.players[this.playerId].cards);
-      this.canStart = false;
+    this.$socket.client.on("startGame", (data) => {
+      this.cards = this.orderCardsInHand(
+        data.deck.filter((card) => {
+          return card.playerId.toString() === this.playerId;
+        })
+      );
     });
   }
 
