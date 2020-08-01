@@ -1,32 +1,36 @@
 <template>
   <div class="container">
     <div class="action-bar">
-      <v-toolbar color="rgba(0,0,0,0)" flat>
+      <v-toolbar color="rgba(0,0,0,0)" flat v-if="position === '0'">
+        <v-spacer></v-spacer>
         <v-btn
+          v-if="!isDisabled"
           class="mx-2"
           small
-          fab
           color="rgba(255,255,255,0.3)"
           @click="resetHand()"
-          ><v-icon dark>mdi-undo</v-icon>
+          >Undo Hand
         </v-btn>
         <v-spacer></v-spacer>
         <v-btn
           class="mx-2"
-          small
-          fab
-          color="rgba(255,255,255,0.3)"
-          @click="addPoint()"
-          ><v-icon dark>mdi-plus</v-icon>
-        </v-btn>
-        <v-btn
-          class="mx-2"
-          small
-          fab
+          big
+          v-if="canStart"
+          :disabled="isDisabled"
           color="rgba(255,255,255,0.3)"
           @click="startGame()"
-          ><v-icon dark>mdi-plus</v-icon>
+          >{{ isDisabled }}
         </v-btn>
+        <v-spacer></v-spacer>
+        <v-btn
+          v-if="!isDisabled"
+          class="mx-2"
+          small
+          color="rgba(255,255,255,0.3)"
+          @click="addPoint()"
+          >Score
+        </v-btn>
+        <v-spacer></v-spacer>
       </v-toolbar>
     </div>
     <div></div>
@@ -62,25 +66,35 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   position = null;
   roomName = null;
   cards = null;
+  isDisabled = true;
+  canStart = true;
 
   mounted() {
     this.position = this.$route.params.position;
     this.roomName = this.$route.params.roomName;
+
     // The user goes to an existing game when route params match
     // local storage params
-    if (
-      localStorage.position === this.position &&
-      localStorage.roomName === this.roomName
-    ) {
-      // @ts-ignore
-      this.$socket.client.emit("reloadGame", {
-        roomName: this.roomName,
-        position: this.position
-      });
-    } else {
-      localStorage.position = this.position;
-      localStorage.roomName = this.roomName;
-    }
+    // if (
+    //   localStorage.position === this.position &&
+    //   localStorage.roomName === this.roomName
+    // ) {
+    //   // @ts-ignore
+    //   this.$socket.client.emit("reloadGame", {
+    //     roomName: this.roomName,
+    //     position: this.position
+    //   });
+    // } else {
+    //   localStorage.position = this.position;
+    //   localStorage.roomName = this.roomName;
+    // }
+
+    // @ts-ignore
+    this.$socket.client.on("canStart", () => {
+      this.isDisabled = false;
+      console.log("can start emitted", this.isDisabled);
+    });
+
     // TODO remove
     // @ts-ignore
     this.$socket.client.on("connectToRoom", data => console.log(data));
@@ -117,6 +131,7 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
     // @ts-ignore
     this.$socket.client.on("startGame", data => {
       this.cards = this.orderCardsInHand(data.players[this.position].cards);
+      this.canStart = false;
     });
   }
 

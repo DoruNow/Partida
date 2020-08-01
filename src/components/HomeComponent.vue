@@ -2,6 +2,7 @@
   <div>
     <GetUserInformationComponent :formType="'start'" />
     <GetUserInformationComponent :formType="'join'" />
+    <v-btn @click="dropDb">Drop db</v-btn>
   </div>
 </template>
 
@@ -15,5 +16,10 @@ import GetUserInformationComponent from "@/components/GetUserInformationComponen
     GetUserInformationComponent
   }
 })
-export default class HomeComponent extends Vue {}
+export default class HomeComponent extends Vue {
+  dropDb() {
+    // @ts-ignore
+    this.$socket.client.emit("dropDb");
+  }
+}
 </script>
