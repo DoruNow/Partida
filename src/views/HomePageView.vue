@@ -75,6 +75,7 @@ export default class HomePageView extends Vue {
   drawer = null;
 
   created(): void {
+    // @ts-ignore
     this.$vuetify.theme.dark = true;
   }
 

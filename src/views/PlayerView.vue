@@ -1,30 +1,37 @@
 <template>
   <div class="container">
     <div class="action-bar">
-      <v-toolbar color="rgba(0,0,0,0)" flat>
+      <v-toolbar color="rgba(0,0,0,0)" flat v-if="playerId === '0'">
+        <v-spacer></v-spacer>
         <v-btn
-          v-if="admin"
           class="mx-2"
           small
-          fab
           color="rgba(255,255,255,0.3)"
-          @click="resetHand(token)"
-          ><v-icon dark>mdi-undo</v-icon>
+          @click="resetHand()"
+          >Undo Hand
+        </v-btn>
+        <v-spacer></v-spacer>
+        <v-btn
+          class="mx-2"
+          big
+          color="rgba(255,255,255,0.3)"
+          @click="startGame()"
+          >{{ isDisabled }}
         </v-btn>
         <v-spacer></v-spacer>
         <v-btn
           class="mx-2"
           small
-          fab
           color="rgba(255,255,255,0.3)"
-          @click="addPoint(token)"
-          ><v-icon dark>mdi-plus</v-icon>
+          @click="addPoint()"
+          >Score
         </v-btn>
+        <v-spacer></v-spacer>
       </v-toolbar>
     </div>
     <div></div>
     <div class="cards">
-      <div class="card-list" v-for="card in orderedCards" :key="card.id">
+      <div class="card-list" v-for="card in cards" :key="card.id">
         <!-- {{ index }} -->
         <img
           :src="playingCardMapper(card)"
@@ -44,47 +51,55 @@
 
 <script lang="ts">
 import Component, { mixins } from "vue-class-component";
-import PlayingCardMapper from "@/mixins/PlayingCardMapper";
+import PlayingCardMapper from "../mixins/PlayingCardMapper";
 import DeckMixin from "../mixins/DeckMixin";
 
-@Component({
-  props: {
-    // TODO rename to `cards`
-    cards1: {
-      type: Object
-    },
-    admin: {
-      type: Boolean
-    },
-    canPlay: {
-      type: Boolean
-    }
-  }
-})
+@Component
 export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
-  // TODO remove test data
-  cards = [
-    { type: "Diamonds", value: 8 },
-    { type: "Spades", value: 4 },
-    { type: "Diamonds", value: 13 },
-    { type: "Clubs", value: 10 },
-    { type: "Diamonds", value: 6 },
-    { type: "Spades", value: 2 },
-    { type: "Spades", value: 5 },
-    { type: "Hearts", value: 8 },
-    { type: "Clubs", value: 2 },
-    { type: "Clubs", value: 3 },
-    { type: "Hearts", value: 2 },
-    { type: "Diamonds", value: 9 },
-    { type: "Diamonds", value: 14 }
-  ];
-
-  // user identification, probably socket ID
-  token = "";
-
   isCardSelected = false;
   selectedCard = {};
   orderedCards = {};
+  playerId = null;
+  roomName = null;
+  cards = null;
+  isDisabled = true;
+  canStart = true;
+
+  mounted() {
+    this.playerId = this.$route.params.playerId;
+    this.roomName = this.$route.params.roomName;
+
+    // The user goes to an existing game when route params match
+    // local storage params
+    // if (
+    //   localStorage.playerId === this.playerId &&
+    //   localStorage.roomName === this.roomName
+    // ) {
+    //   // @ts-ignore
+    //   this.$socket.client.emit("reloadGame", {
+    //     roomName: this.roomName,
+    //     playerId: this.playerId
+    //   });
+    // } else {
+    //   localStorage.playerId = this.playerId;
+    //   localStorage.roomName = this.roomName;
+    // }
+
+    // @ts-ignore
+    this.$socket.client.on("canStart", () => {
+      this.setIsDisabled();
+    });
+
+    // TODO remove
+    // @ts-ignore
+    this.$socket.client.on("connectToRoom", data => console.log(data));
+    // @ts-ignore
+    this.$socket.client.on("catchError", data => console.log(data));
+  }
+
+  setIsDisabled() {
+    this.isDisabled = false;
+  }
 
   setCardState(card) {
     this.isCardSelected ? this.playCard(card) : this.selectCard(card);
@@ -95,6 +110,10 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
       this.isCardSelected = false;
       this.selectedCard = {};
       card.hide = true;
+      // @ts-ignore
+      this.$socket.client.emit("playCard", {
+        card
+      });
     } else {
       this.selectedCard = card;
     }
@@ -105,17 +124,34 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
     this.selectedCard = card;
   }
 
-  mounted() {
-    this.orderedCards = this.orderCardsInHand(this.cards);
+  startGame() {
+    // @ts-ignore
+    this.$socket.client.emit("startGame", { roomName: this.roomName });
+    // @ts-ignore
+    this.$socket.client.on("startGame", data => {
+      this.cards = this.orderCardsInHand(data.players[this.playerId].cards);
+      this.canStart = false;
+    });
   }
 
-  // eslint-disable-next-line
-  addPoint(token) {
-    // send event to add point
+  endCurrentHandSuccessfully() {
+    // @ts-ignore
+    this.$socket.client.emit("endCurrentHandSuccessfully");
+    // @ts-ignore
+    this.$socket.client.emit("addPoint", { team: this.playerId % 2 });
   }
-  // eslint-disable-next-line
-  resetHand(token) {
-    // send event to reset hand
+
+  // api may change
+  undoHand() {
+    // @ts-ignore
+    this.$socket.client.emit("undoHand");
+  }
+
+  restartGame() {
+    this.startGame();
+
+    localStorage.playerId = undefined;
+    localStorage.roomName = undefined;
   }
 }
 </script>

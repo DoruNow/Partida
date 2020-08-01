@@ -9,12 +9,12 @@ import App from "./App.vue";
 
 Vue.config.productionTip = false;
 const socket = io("http://localhost:3000");
+// Vue.config.silent = true;
 
 Vue.use(VueSocketIO, socket);
 new Vue({
   router,
   // @ts-ignore
   vuetify,
-  socket,
   render: h => h(App)
 }).$mount("#app");

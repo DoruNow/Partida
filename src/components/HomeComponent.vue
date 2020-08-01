@@ -3,6 +3,7 @@
     <GetUserInformationComponent :formType="'start'" />
     <GetUserInformationComponent :formType="'join'" />
     <v-btn @click="dropDb">Drop db</v-btn>
+    <v-btn @click="createTestRoom">Create test room</v-btn>
   </div>
 </template>
 
@@ -20,6 +21,39 @@ export default class HomeComponent extends Vue {
   dropDb() {
     // @ts-ignore
     this.$socket.client.emit("dropDb");
+  }
+
+  createTestRoom() {
+    // @ts-ignore
+    this.$socket.client.emit("createRoom", {
+      roomName: "testRoom",
+      playerName: "Player 1",
+      pin: 1091,
+      playerId: 0
+    });
+    // @ts-ignore
+    this.$socket.client.emit("joinRoom", {
+      roomName: "testRoom",
+      playerName: "Player 2",
+      pin: 1091,
+      playerId: 1
+    });
+    // @ts-ignore
+    this.$socket.client.emit("joinRoom", {
+      roomName: "testRoom",
+      playerName: "Player 3",
+      pin: 1091,
+      playerId: 2
+    });
+    // @ts-ignore
+    this.$socket.client.emit("joinRoom", {
+      roomName: "testRoom",
+      playerName: "Player 4",
+      pin: 1091,
+      playerId: 3
+    });
+
+    this.$router.push("/player/0/testRoom").catch(err => err);
   }
 }
 </script>
