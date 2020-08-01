@@ -1,10 +1,9 @@
 <template>
   <div class="container">
     <div class="action-bar">
-      <v-toolbar color="rgba(0,0,0,0)" flat v-if="position === '0'">
+      <v-toolbar color="rgba(0,0,0,0)" flat v-if="playerId === '0'">
         <v-spacer></v-spacer>
         <v-btn
-          v-if="!isDisabled"
           class="mx-2"
           small
           color="rgba(255,255,255,0.3)"
@@ -15,15 +14,12 @@
         <v-btn
           class="mx-2"
           big
-          v-if="canStart"
-          :disabled="isDisabled"
           color="rgba(255,255,255,0.3)"
           @click="startGame()"
           >{{ isDisabled }}
         </v-btn>
         <v-spacer></v-spacer>
         <v-btn
-          v-if="!isDisabled"
           class="mx-2"
           small
           color="rgba(255,255,255,0.3)"
@@ -63,36 +59,35 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   isCardSelected = false;
   selectedCard = {};
   orderedCards = {};
-  position = null;
+  playerId = null;
   roomName = null;
   cards = null;
   isDisabled = true;
   canStart = true;
 
   mounted() {
-    this.position = this.$route.params.position;
+    this.playerId = this.$route.params.playerId;
     this.roomName = this.$route.params.roomName;
 
     // The user goes to an existing game when route params match
     // local storage params
     // if (
-    //   localStorage.position === this.position &&
+    //   localStorage.playerId === this.playerId &&
     //   localStorage.roomName === this.roomName
     // ) {
     //   // @ts-ignore
     //   this.$socket.client.emit("reloadGame", {
     //     roomName: this.roomName,
-    //     position: this.position
+    //     playerId: this.playerId
     //   });
     // } else {
-    //   localStorage.position = this.position;
+    //   localStorage.playerId = this.playerId;
     //   localStorage.roomName = this.roomName;
     // }
 
     // @ts-ignore
     this.$socket.client.on("canStart", () => {
-      this.isDisabled = false;
-      console.log("can start emitted", this.isDisabled);
+      this.setIsDisabled();
     });
 
     // TODO remove
@@ -100,6 +95,10 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
     this.$socket.client.on("connectToRoom", data => console.log(data));
     // @ts-ignore
     this.$socket.client.on("catchError", data => console.log(data));
+  }
+
+  setIsDisabled() {
+    this.isDisabled = false;
   }
 
   setCardState(card) {
@@ -130,7 +129,7 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
     this.$socket.client.emit("startGame", { roomName: this.roomName });
     // @ts-ignore
     this.$socket.client.on("startGame", data => {
-      this.cards = this.orderCardsInHand(data.players[this.position].cards);
+      this.cards = this.orderCardsInHand(data.players[this.playerId].cards);
       this.canStart = false;
     });
   }
@@ -139,7 +138,7 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
     // @ts-ignore
     this.$socket.client.emit("endCurrentHandSuccessfully");
     // @ts-ignore
-    this.$socket.client.emit("addPoint", { team: this.position % 2 });
+    this.$socket.client.emit("addPoint", { team: this.playerId % 2 });
   }
 
   // api may change
@@ -151,7 +150,7 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   restartGame() {
     this.startGame();
 
-    localStorage.position = undefined;
+    localStorage.playerId = undefined;
     localStorage.roomName = undefined;
   }
 }

@@ -110,7 +110,7 @@ export default class GetUserInformationComponent extends Vue {
         roomName: this.roomName,
         playerName: this.playerName,
         pin: this.pin,
-        position: this.select
+        playerId: this.select
       });
       this.$router
         .push(`/player/${this.select}/${this.roomName}`)

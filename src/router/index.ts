@@ -12,7 +12,7 @@ const routes = [
     component: HomePageView
   },
   {
-    path: "/player/:position/:roomName",
+    path: "/player/:playerId/:roomName",
     component: PlayerView
   },
   {
