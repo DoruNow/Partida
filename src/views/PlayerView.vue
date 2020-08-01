@@ -113,6 +113,7 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
       // @ts-ignore
       this.$socket.client.emit("playCard", {
         card,
+        roomName: this.roomName,
       });
     } else {
       this.selectedCard = card;
@@ -129,9 +130,11 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
     this.$socket.client.emit("startGame", { roomName: this.roomName });
     // @ts-ignore
     this.$socket.client.on("startGame", (data) => {
-      console.log(data);
-      // this.cards = this.orderCardsInHand(data.players[this.playerId].cards);
-      // this.canStart = false;
+      this.cards = this.orderCardsInHand(
+        data.deck.filter((card) => {
+          return card.playerId.toString() === this.playerId;
+        })
+      );
     });
   }
 

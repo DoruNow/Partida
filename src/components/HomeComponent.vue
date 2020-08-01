@@ -24,6 +24,7 @@ export default class HomeComponent extends Vue {
   }
 
   createTestRoom() {
+    this.dropDb();
     // @ts-ignore
     this.$socket.client.emit("createRoom", {
       roomName: "testRoom",
