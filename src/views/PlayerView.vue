@@ -35,11 +35,7 @@
         <!-- {{ index }} -->
         <img
           :src="playingCardMapper(card)"
-          :class="
-            JSON.stringify(card) === JSON.stringify(selectedCard)
-              ? 'selected'
-              : ''
-          "
+          :class="setCardClass(card, selectedCard)"
           class="card"
           v-show="!card.hide"
           @click="setCardState(card)"
@@ -71,34 +67,31 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
 
     // The user goes to an existing game when route params match
     // local storage params
-    // if (
-    //   localStorage.playerId === this.playerId &&
-    //   localStorage.roomName === this.roomName
-    // ) {
-    //   // @ts-ignore
-    //   this.$socket.client.emit("reloadGame", {
-    //     roomName: this.roomName,
-    //     playerId: this.playerId
-    //   });
-    // } else {
-    //   localStorage.playerId = this.playerId;
-    //   localStorage.roomName = this.roomName;
-    // }
-
-    // @ts-ignore
-    this.$socket.client.on("canStart", () => {
-      this.setIsDisabled();
-    });
+    if (
+      localStorage.playerId === this.playerId &&
+      localStorage.roomName === this.roomName
+    ) {
+      // @ts-ignore
+      this.$socket.client.emit("reloadGame", {
+        roomName: this.roomName,
+        playerId: this.playerId
+      });
+    } else {
+      localStorage.playerId = this.playerId;
+      localStorage.roomName = this.roomName;
+    }
 
     // TODO remove
     // @ts-ignore
-    this.$socket.client.on("connectToRoom", (data) => console.log(data));
+    this.$socket.client.on("connectToRoom", data => console.log(data));
     // @ts-ignore
-    this.$socket.client.on("catchError", (data) => console.log(data));
+    this.$socket.client.on("sendNotification", data => console.log(data));
   }
 
-  setIsDisabled() {
-    this.isDisabled = false;
+  setCardClass(card, selectedCard) {
+    return JSON.stringify(card) === JSON.stringify(selectedCard)
+      ? "selected"
+      : "";
   }
 
   setCardState(card) {
@@ -113,7 +106,7 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
       // @ts-ignore
       this.$socket.client.emit("playCard", {
         card,
-        roomName: this.roomName,
+        roomName: this.roomName
       });
     } else {
       this.selectedCard = card;
@@ -129,9 +122,9 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
     // @ts-ignore
     this.$socket.client.emit("startGame", { roomName: this.roomName });
     // @ts-ignore
-    this.$socket.client.on("startGame", (data) => {
+    this.$socket.client.on("startGame", data => {
       this.cards = this.orderCardsInHand(
-        data.deck.filter((card) => {
+        data.deck.filter(card => {
           return card.playerId.toString() === this.playerId;
         })
       );
@@ -171,16 +164,20 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
 
 .cards
   max-width: 100vw
+  position: relative
+  left: -23.5vw
+  display: flex
+  justify-content: center
 
 .card-list
   width: 6vw
+  position: relative
   float: left
 
 .card
-  height: 60vhorderedCards
-  top: -20px
+  height: 60vh
 
 .selected
   position: relative
-  top: -20px
+  top: -15vh
 </style>
