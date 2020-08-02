@@ -31,16 +31,15 @@
     </div>
     <div></div>
     <div class="cards">
-      <div class="card-list" v-for="card in cards" :key="card.id">
-        <!-- {{ index }} -->
-        <img
-          :src="playingCardMapper(card)"
-          :class="setCardClass(card, selectedCard)"
-          class="card"
-          v-show="!card.hide"
-          @click="setCardState(card)"
-        />
-      </div>
+      <img
+        v-for="card in cards"
+        :key="card.id"
+        :src="playingCardMapper(card)"
+        :class="setCardClass(card)"
+        class="card"
+        v-show="!card.hide"
+        @click="clickCard(card)"
+      />
     </div>
   </div>
 </template>
@@ -74,7 +73,7 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
       // @ts-ignore
       this.$socket.client.emit("reloadGame", {
         roomName: this.roomName,
-        playerId: this.playerId
+        playerId: this.playerId,
       });
     } else {
       localStorage.playerId = this.playerId;
@@ -83,52 +82,60 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
 
     // TODO remove
     // @ts-ignore
-    this.$socket.client.on("connectToRoom", data => console.log(data));
+    // this.$socket.client.on("connectToRoom", (data) => console.log(data));
     // @ts-ignore
-    this.$socket.client.on("sendNotification", data => console.log(data));
+    this.$socket.client.on("sendNotification", (data) => console.log(data));
+    // @ts-ignore
+    this.$socket.client.on(
+      "reloadGame",
+      (data) => (this.cards = this.filterCards(data))
+    );
   }
 
-  setCardClass(card, selectedCard) {
-    return JSON.stringify(card) === JSON.stringify(selectedCard)
-      ? "selected"
-      : "";
-  }
-
-  setCardState(card) {
-    this.isCardSelected ? this.playCard(card) : this.selectCard(card);
-  }
-
-  playCard(card) {
+  clickCard(card) {
+    // if clicked card is found as selected
     if (JSON.stringify(card) === JSON.stringify(this.selectedCard)) {
-      this.isCardSelected = false;
-      this.selectedCard = {};
-      card.hide = true;
       // @ts-ignore
       this.$socket.client.emit("playCard", {
         card,
-        roomName: this.roomName
+        roomName: this.roomName,
       });
-    } else {
+      this.cards = this.cards.filter(
+        (card) => JSON.stringify(card) !== JSON.stringify(this.selectedCard)
+      );
+      this.selectedCard = {};
+      console.log(this.cards.length);
+    }
+    // if clicked card is resting
+    if (JSON.stringify(card) !== JSON.stringify(this.selectedCard)) {
       this.selectedCard = card;
     }
   }
 
-  selectCard(card) {
-    this.isCardSelected = true;
-    this.selectedCard = card;
+  setCardClass(card) {
+    if (JSON.stringify(card) === JSON.stringify(this.selectedCard)) {
+      return "selected";
+    } else {
+      return "";
+    }
   }
 
   startGame() {
     // @ts-ignore
     this.$socket.client.emit("startGame", { roomName: this.roomName });
     // @ts-ignore
-    this.$socket.client.on("startGame", data => {
-      this.cards = this.orderCardsInHand(
-        data.deck.filter(card => {
-          return card.playerId.toString() === this.playerId;
-        })
-      );
+    this.$socket.client.on("startGame", (data) => {
+      this.cards = this.filterCards(data);
     });
+  }
+
+  private filterCards(data) {
+    return this.orderCardsInHand(
+      data.deck.filter((card) => {
+        console.log(card);
+        return card.playerId.toString() === this.playerId;
+      })
+    ).filter((card) => card.played === false);
   }
 
   endCurrentHandSuccessfully() {
@@ -165,19 +172,32 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
 .cards
   max-width: 100vw
   position: relative
-  left: -23.5vw
+  left: -8.5vw
   display: flex
-  justify-content: center
-
-.card-list
-  width: 6vw
-  position: relative
-  float: left
+  justify-content: centered
 
 .card
   height: 60vh
 
 .selected
   position: relative
+  animation: 0.3s selectCard
   top: -15vh
+
+.discard
+  position: relative
+  animation: 1s discard
+  top: -150vh
+
+@keyframes selectCard
+  0%
+    top: 0vh
+  100%
+    top: -15vh
+
+@keyframes discard
+  0%
+    top: -15vh
+  100%
+    top: -150vh
 </style>
