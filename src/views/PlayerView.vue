@@ -1,12 +1,13 @@
 <template>
   <div class="container">
     <div class="action-bar">
-      <v-toolbar color="rgba(0,0,0,0)" flat v-if="playerId === '0'">
+      <v-toolbar color="rgba(0,0,0,0)" flat>
         <v-spacer></v-spacer>
         <v-btn
           class="mx-2"
           small
           color="rgba(255,255,255,0.3)"
+          v-if="canStart && playerId === '0'"
           @click="resetHand()"
           >Undo Hand
         </v-btn>
@@ -15,14 +16,19 @@
           class="mx-2"
           big
           color="rgba(255,255,255,0.3)"
+          v-if="canStart"
           @click="startGame()"
           >Start game
         </v-btn>
+        <div v-if="!canStart">
+          Players connected: <span>{{ playersConnected }}</span>
+        </div>
         <v-spacer></v-spacer>
         <v-btn
           class="mx-2"
           small
           color="rgba(255,255,255,0.3)"
+          v-if="canStart && playerId === '0'"
           @click="addPoint()"
           >Score
         </v-btn>
@@ -58,7 +64,8 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   roomName = null;
   cards = null;
   isDisabled = true;
-  canStart = true;
+  canStart = false;
+  playersConnected = 0;
 
   mounted() {
     this.playerId = this.$route.params.playerId;
@@ -80,16 +87,16 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
       localStorage.roomName = this.roomName;
     }
 
-    // TODO remove
-    // @ts-ignore
-    // this.$socket.client.on("connectToRoom", (data) => console.log(data));
+    // TODO dev-remove
     // @ts-ignore
     this.$socket.client.on("sendNotification", (data) => console.log(data));
     // @ts-ignore
-    this.$socket.client.on(
-      "reloadGame",
-      (data) => (this.cards = this.filterCards(data))
-    );
+    this.$socket.client.on("joinRoom", (data) => {
+      console.log("joinRoom", data);
+      this.playersConnected = data.length;
+      data.length === 4 ? (this.canStart = true) : (this.canStart = false);
+    });
+    // TODO add Add reload game listener
   }
 
   clickCard(card) {
@@ -104,7 +111,6 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
         (card) => JSON.stringify(card) !== JSON.stringify(this.selectedCard)
       );
       this.selectedCard = {};
-      console.log(this.cards.length);
     }
     // if clicked card is resting
     if (JSON.stringify(card) !== JSON.stringify(this.selectedCard)) {
@@ -132,7 +138,6 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   private filterCards(data) {
     return this.orderCardsInHand(
       data.deck.filter((card) => {
-        console.log(card);
         return card.playerId.toString() === this.playerId;
       })
     ).filter((card) => card.played === false);
