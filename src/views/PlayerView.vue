@@ -24,13 +24,21 @@
           Players connected: <span>{{ playersConnected }}</span>
         </div>
         <v-spacer></v-spacer>
-        <v-btn
+        <!-- <v-btn
           class="mx-2"
           small
           color="rgba(255,255,255,0.3)"
           v-if="canStart && playerId === '0'"
           @click="addPoint()"
-          >Score
+          >End hand
+        </v-btn> -->
+        <v-btn
+          class="mx-2"
+          small
+          color="rgba(255,255,255,0.3)"
+          v-if="canStart && playerId === '0'"
+          @click="endHand()"
+          >End hand
         </v-btn>
         <v-spacer></v-spacer>
       </v-toolbar>
@@ -94,7 +102,6 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
     this.$socket.client.on("sendNotification", (data) => console.log(data));
     // @ts-ignore
     this.$socket.client.on("joinRoom", (data) => {
-      console.log("joinRoom", data);
       this.playersConnected = data.length;
       data.length === 4 ? (this.canStart = true) : (this.canStart = false);
     });
@@ -163,6 +170,11 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
 
     localStorage.playerId = undefined;
     localStorage.roomName = undefined;
+  }
+
+  endHand() {
+    // @ts-ignore
+    this.$socket.client.emit("endHand", { roomName: this.roomName });
   }
 }
 </script>
