@@ -37,15 +37,17 @@
     </div>
     <div></div>
     <div class="cards">
-      <img
-        v-for="card in cards"
-        :key="card.id"
-        :src="playingCardMapper(card)"
-        :class="setCardClass(card)"
-        class="card"
-        v-show="!card.hide"
-        @click="clickCard(card)"
-      />
+      <div class="card-wrapper">
+        <img
+          v-for="card in cards"
+          :key="card.id"
+          :src="playingCardMapper(card)"
+          :class="setCardClass(card)"
+          class="card"
+          v-show="!card.hide"
+          @click="clickCard(card)"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -175,14 +177,20 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   grid-template-rows: 10vh 30vh 60vh
 
 .cards
-  max-width: 100vw
+  width: 100vw
+  left: -4vw
   position: relative
-  left: -8.5vw
   display: flex
-  justify-content: centered
+  justify-content: center
+
+.card-wrapper
+  width: 83.2vw
+  display: grid
+  grid-template-columns: repeat(auto-fill, 6.4vw)
+  align-content: end
 
 .card
-  height: 60vh
+  width: 14.6vw
 
 .selected
   position: relative
