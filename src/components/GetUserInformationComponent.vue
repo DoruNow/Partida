@@ -89,7 +89,7 @@ export default class GetUserInformationComponent extends Vue {
   goToGame(): void {
     // this.dropDb();
     // @ts-ignore
-    this.$socket.$subscribe("catchError", data => console.log(data));
+    this.$socket.$subscribe("sendNotification", data => console.log(data));
     if (this.formType === "start") {
       // @ts-ignore
       this.$socket.client.emit("createRoom", {

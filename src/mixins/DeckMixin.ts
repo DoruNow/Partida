@@ -1,6 +1,9 @@
 export interface Card {
   value: number;
   type: string;
+  played: boolean;
+  playerId: number;
+  cardPlayedNo: number;
 }
 
 import Vue from "vue";

@@ -1,12 +1,13 @@
 <template>
   <div class="container">
     <div class="action-bar">
-      <v-toolbar color="rgba(0,0,0,0)" flat v-if="playerId === '0'">
+      <v-toolbar color="rgba(0,0,0,0)" flat>
         <v-spacer></v-spacer>
         <v-btn
           class="mx-2"
           small
           color="rgba(255,255,255,0.3)"
+          v-if="canStart && playerId === '0'"
           @click="resetHand()"
           >Undo Hand
         </v-btn>
@@ -15,14 +16,19 @@
           class="mx-2"
           big
           color="rgba(255,255,255,0.3)"
+          v-if="canStart"
           @click="startGame()"
           >Start game
         </v-btn>
+        <div v-if="!canStart">
+          Players connected: <span>{{ playersConnected }}</span>
+        </div>
         <v-spacer></v-spacer>
         <v-btn
           class="mx-2"
           small
           color="rgba(255,255,255,0.3)"
+          v-if="canStart && playerId === '0'"
           @click="addPoint()"
           >Score
         </v-btn>
@@ -31,20 +37,15 @@
     </div>
     <div></div>
     <div class="cards">
-      <div class="card-list" v-for="card in cards" :key="card.id">
-        <!-- {{ index }} -->
-        <img
-          :src="playingCardMapper(card)"
-          :class="
-            JSON.stringify(card) === JSON.stringify(selectedCard)
-              ? 'selected'
-              : ''
-          "
-          class="card"
-          v-show="!card.hide"
-          @click="setCardState(card)"
-        />
-      </div>
+      <img
+        v-for="card in cards"
+        :key="card.id"
+        :src="playingCardMapper(card)"
+        :class="setCardClass(card)"
+        class="card"
+        v-show="!card.hide"
+        @click="clickCard(card)"
+      />
     </div>
   </div>
 </template>
@@ -63,7 +64,8 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   roomName = null;
   cards = null;
   isDisabled = true;
-  canStart = true;
+  canStart = false;
+  playersConnected = 0;
 
   mounted() {
     this.playerId = this.$route.params.playerId;
@@ -71,58 +73,57 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
 
     // The user goes to an existing game when route params match
     // local storage params
-    // if (
-    //   localStorage.playerId === this.playerId &&
-    //   localStorage.roomName === this.roomName
-    // ) {
-    //   // @ts-ignore
-    //   this.$socket.client.emit("reloadGame", {
-    //     roomName: this.roomName,
-    //     playerId: this.playerId
-    //   });
-    // } else {
-    //   localStorage.playerId = this.playerId;
-    //   localStorage.roomName = this.roomName;
-    // }
+    if (
+      localStorage.playerId === this.playerId &&
+      localStorage.roomName === this.roomName
+    ) {
+      // @ts-ignore
+      this.$socket.client.emit("reloadGame", {
+        roomName: this.roomName,
+        playerId: this.playerId,
+      });
+    } else {
+      localStorage.playerId = this.playerId;
+      localStorage.roomName = this.roomName;
+    }
 
+    // TODO dev-remove
     // @ts-ignore
-    this.$socket.client.on("canStart", () => {
-      this.setIsDisabled();
+    this.$socket.client.on("sendNotification", (data) => console.log(data));
+    // @ts-ignore
+    this.$socket.client.on("joinRoom", (data) => {
+      console.log("joinRoom", data);
+      this.playersConnected = data.length;
+      data.length === 4 ? (this.canStart = true) : (this.canStart = false);
     });
-
-    // TODO remove
-    // @ts-ignore
-    this.$socket.client.on("connectToRoom", (data) => console.log(data));
-    // @ts-ignore
-    this.$socket.client.on("catchError", (data) => console.log(data));
+    // TODO add Add reload game listener
   }
 
-  setIsDisabled() {
-    this.isDisabled = false;
-  }
-
-  setCardState(card) {
-    this.isCardSelected ? this.playCard(card) : this.selectCard(card);
-  }
-
-  playCard(card) {
+  clickCard(card) {
+    // if clicked card is found as selected
     if (JSON.stringify(card) === JSON.stringify(this.selectedCard)) {
-      this.isCardSelected = false;
-      this.selectedCard = {};
-      card.hide = true;
       // @ts-ignore
       this.$socket.client.emit("playCard", {
         card,
         roomName: this.roomName,
       });
-    } else {
+      this.cards = this.cards.filter(
+        (card) => JSON.stringify(card) !== JSON.stringify(this.selectedCard)
+      );
+      this.selectedCard = {};
+    }
+    // if clicked card is resting
+    if (JSON.stringify(card) !== JSON.stringify(this.selectedCard)) {
       this.selectedCard = card;
     }
   }
 
-  selectCard(card) {
-    this.isCardSelected = true;
-    this.selectedCard = card;
+  setCardClass(card) {
+    if (JSON.stringify(card) === JSON.stringify(this.selectedCard)) {
+      return "selected";
+    } else {
+      return "";
+    }
   }
 
   startGame() {
@@ -130,12 +131,16 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
     this.$socket.client.emit("startGame", { roomName: this.roomName });
     // @ts-ignore
     this.$socket.client.on("startGame", (data) => {
-      this.cards = this.orderCardsInHand(
-        data.deck.filter((card) => {
-          return card.playerId.toString() === this.playerId;
-        })
-      );
+      this.cards = this.filterCards(data);
     });
+  }
+
+  private filterCards(data) {
+    return this.orderCardsInHand(
+      data.deck.filter((card) => {
+        return card.playerId.toString() === this.playerId;
+      })
+    ).filter((card) => card.played === false);
   }
 
   endCurrentHandSuccessfully() {
@@ -171,16 +176,33 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
 
 .cards
   max-width: 100vw
-
-.card-list
-  width: 6vw
-  float: left
+  position: relative
+  left: -8.5vw
+  display: flex
+  justify-content: centered
 
 .card
-  height: 60vhorderedCards
-  top: -20px
+  height: 60vh
 
 .selected
   position: relative
-  top: -20px
+  animation: 0.3s selectCard
+  top: -15vh
+
+.discard
+  position: relative
+  animation: 1s discard
+  top: -150vh
+
+@keyframes selectCard
+  0%
+    top: 0vh
+  100%
+    top: -15vh
+
+@keyframes discard
+  0%
+    top: -15vh
+  100%
+    top: -150vh
 </style>
