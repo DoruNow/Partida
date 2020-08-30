@@ -69,7 +69,7 @@ import Component from "vue-class-component";
 import LicitatiiComponent from "@/components/LicitatiiComponent.vue";
 
 @Component({
-  components: { LicitatiiComponent },
+  components: { LicitatiiComponent }
 })
 export default class HomePageView extends Vue {
   drawer = null;

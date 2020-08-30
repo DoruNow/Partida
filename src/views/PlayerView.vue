@@ -81,31 +81,36 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
     this.playerId = this.$route.params.playerId;
     this.roomName = this.$route.params.roomName;
 
-    // The user goes to an existing game when route params match
-    // local storage params
-    if (
-      localStorage.playerId === this.playerId &&
-      localStorage.roomName === this.roomName
-    ) {
-      // @ts-ignore
-      this.$socket.client.emit("reloadGame", {
-        roomName: this.roomName,
-        playerId: this.playerId,
-      });
-    } else {
-      localStorage.playerId = this.playerId;
-      localStorage.roomName = this.roomName;
-    }
-
     // TODO dev-remove
     // @ts-ignore
     this.$socket.client.on("sendNotification", (data) => console.log(data));
     // @ts-ignore
+    this.$socket.client.emit("getPlayers", { roomName: this.roomName });
+    // @ts-ignore
+    this.$socket.client.on(
+      "getPlayers",
+      (data) => (this.playersConnected = data.length)
+    );
+
+    // The user goes to an existing game when route params match
+    // local storage params
+    // if (
+    //   localStorage.playerId === this.playerId &&
+    //   localStorage.roomName === this.roomName
+    // ) {
+    //   // @ts-ignore
+    //   this.$socket.client.emit("reloadGame", {
+    //     roomName: this.roomName,
+    //     playerId: this.playerId,
+    //   });
+    // } else {
+    //   localStorage.playerId = this.playerId;
+    //   localStorage.roomName = this.roomName;
+    // }
+    // @ts-ignore
     this.$socket.client.on("joinRoom", (data) => {
-      this.playersConnected = data.length;
       data.length === 4 ? (this.canStart = true) : (this.canStart = false);
     });
-    // TODO add Add reload game listener
   }
 
   clickCard(card) {

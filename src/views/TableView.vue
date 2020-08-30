@@ -22,14 +22,14 @@ export default class TableView extends mixins(PlayingCardMapper) {
   mounted() {
     this.roomName = this.$route.params.roomName;
     // @ts-ignore
-    this.$socket.client.on("updateTable", (data) => {
+    this.$socket.client.on("updateTable", data => {
       console.log(data);
       this.payload = data;
     });
 
     // TODO dev-remove
     // @ts-ignore
-    this.$socket.client.on("sendNotification", (data) => console.log(data));
+    this.$socket.client.on("sendNotification", data => console.log(data));
     // @ts-ignore
     this.$socket.client.emit("joinTable", { roomName: this.roomName });
   }

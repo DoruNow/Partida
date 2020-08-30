@@ -37,7 +37,7 @@
         ></v-text-field>
         <v-select
           v-if="showJoinGame"
-          v-model="select"
+          v-model="playerId"
           :items="playerSelection"
           label="Select Player"
           item-value="value"
@@ -59,7 +59,7 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 export default class GetUserInformationComponent extends Vue {
   @Prop(String) readonly formType: "start" | "join";
 
-  select = null;
+  playerId = null;
   pin = 1091;
   menuCardButtonText = "";
   showJoinGame = false;
@@ -84,45 +84,36 @@ export default class GetUserInformationComponent extends Vue {
       this.menuCardButtonText = "Join Game";
       this.showJoinGame = true;
     }
+
+    // TODO dev-remove
+    // @ts-ignore
+    this.$socket.client.on("sendNotification", data => console.log(data));
   }
 
   goToGame(): void {
-    // this.dropDb();
-    // @ts-ignore
-    this.$socket.$subscribe("sendNotification", data => console.log(data));
     if (this.formType === "start") {
       // @ts-ignore
       this.$socket.client.emit("createRoom", {
         roomName: this.roomName,
-        playerName: this.playerName,
-        pin: this.pin
+        playerName: this.playerName
       });
-
       // @ts-ignore
-      this.$socket.$subscribe("roomCreated", data => {
-        if (data) {
-          this.$router.push(`/player/0/${this.roomName}`).catch(err => err);
-        }
+      this.$socket.$subscribe("canPush", () => {
+        this.$router.push(`/player/0/${this.roomName}`).catch(err => err);
       });
-    } else if (this.formType === "join") {
+    }
+    if (this.formType === "join") {
       // @ts-ignore
       this.$socket.client.emit("joinRoom", {
         roomName: this.roomName,
-        playerName: this.playerName,
-        pin: this.pin,
-        playerId: this.select
+        playerId: this.playerId,
+        playerName: this.playerName
       });
-      this.$router
-        .push(`/player/${this.select}/${this.roomName}`)
-        .catch(err => err);
-
       // @ts-ignore
-      this.$socket.$subscribe("connectToRoom", data => {
-        if (data) {
-          this.$router
-            .push(`/player/${this.select}/${this.roomName}`)
-            .catch(err => err);
-        }
+      this.$socket.$subscribe("canJoinRoom", () => {
+        this.$router
+          .push(`/player/${this.playerId}/${this.roomName}`)
+          .catch(err => err);
       });
     }
   }
