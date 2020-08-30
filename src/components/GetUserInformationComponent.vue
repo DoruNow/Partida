@@ -70,11 +70,11 @@ export default class GetUserInformationComponent extends Vue {
   playerSelection = [
     { text: "Player 2", value: 1 },
     { text: "Player 3", value: 2 },
-    { text: "Player 4", value: 3 }
+    { text: "Player 4", value: 3 },
   ];
-  required = [v => !!v || "Required field"];
+  required = [(v) => !!v || "Required field"];
   settings = {
-    roomName: String
+    roomName: String,
   };
 
   mounted() {
@@ -87,7 +87,7 @@ export default class GetUserInformationComponent extends Vue {
 
     // TODO dev-remove
     // @ts-ignore
-    this.$socket.client.on("sendNotification", data => console.log(data));
+    this.$socket.client.on("sendNotification", (data) => console.log(data));
   }
 
   goToGame(): void {
@@ -95,11 +95,12 @@ export default class GetUserInformationComponent extends Vue {
       // @ts-ignore
       this.$socket.client.emit("createRoom", {
         roomName: this.roomName,
-        playerName: this.playerName
+        playerName: this.playerName,
+        pin: this.pin,
       });
       // @ts-ignore
       this.$socket.$subscribe("canPush", () => {
-        this.$router.push(`/player/0/${this.roomName}`).catch(err => err);
+        this.$router.push(`/player/0/${this.roomName}`).catch((err) => err);
       });
     }
     if (this.formType === "join") {
@@ -107,13 +108,14 @@ export default class GetUserInformationComponent extends Vue {
       this.$socket.client.emit("joinRoom", {
         roomName: this.roomName,
         playerId: this.playerId,
-        playerName: this.playerName
+        playerName: this.playerName,
+        pin: this.pin,
       });
       // @ts-ignore
       this.$socket.$subscribe("canJoinRoom", () => {
         this.$router
           .push(`/player/${this.playerId}/${this.roomName}`)
-          .catch(err => err);
+          .catch((err) => err);
       });
     }
   }
