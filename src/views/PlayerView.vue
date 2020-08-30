@@ -14,9 +14,9 @@
         <v-spacer></v-spacer>
         <v-btn
           class="mx-2"
+          v-if="canStart"
           big
           color="rgba(255,255,255,0.3)"
-          v-if="canStart"
           @click="startGame()"
           >Start game
         </v-btn>
@@ -91,6 +91,10 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
       "getPlayers",
       (data) => (this.playersConnected = data.length)
     );
+    // @ts-ignore
+    this.$socket.client.on("startGame", (data) => {
+      this.cards = this.filterCards(data);
+    });
 
     // The user goes to an existing game when route params match
     // local storage params
@@ -143,10 +147,6 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
   startGame() {
     // @ts-ignore
     this.$socket.client.emit("startGame", { roomName: this.roomName });
-    // @ts-ignore
-    this.$socket.client.on("startGame", (data) => {
-      this.cards = this.filterCards(data);
-    });
   }
 
   private filterCards(data) {
