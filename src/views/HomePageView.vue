@@ -27,7 +27,7 @@
             <v-icon>mdi-cards-club</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title @click="goTo('table')"
+            <v-list-item-title @click="goTo('table/testRoom')"
               >Go To Table Route</v-list-item-title
             >
           </v-list-item-content>

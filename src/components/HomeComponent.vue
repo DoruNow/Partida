@@ -14,8 +14,8 @@ import GetUserInformationComponent from "@/components/GetUserInformationComponen
 
 @Component({
   components: {
-    GetUserInformationComponent,
-  },
+    GetUserInformationComponent
+  }
 })
 export default class HomeComponent extends Vue {
   dropDb() {
@@ -30,7 +30,7 @@ export default class HomeComponent extends Vue {
       roomName: "testRoom",
       playerName: "Player 1",
       pin: 1091,
-      playerId: 0,
+      playerId: 0
     });
     setTimeout(() => {
       // @ts-ignore
@@ -38,7 +38,7 @@ export default class HomeComponent extends Vue {
         roomName: "testRoom",
         playerName: "Player 2",
         pin: 1091,
-        playerId: 1,
+        playerId: 1
       });
     }, 200);
 
@@ -48,7 +48,7 @@ export default class HomeComponent extends Vue {
         roomName: "testRoom",
         playerName: "Player 3",
         pin: 1091,
-        playerId: 2,
+        playerId: 2
       });
     }, 400);
 
@@ -58,9 +58,9 @@ export default class HomeComponent extends Vue {
         roomName: "testRoom",
         playerName: "Player 4",
         pin: 1091,
-        playerId: 3,
+        playerId: 3
       });
-      this.$router.push("/player/0/testRoom").catch((err) => err);
+      this.$router.push("/player/0/testRoom").catch(err => err);
     }, 600);
   }
 }
