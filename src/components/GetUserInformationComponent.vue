@@ -87,7 +87,7 @@ export default class GetUserInformationComponent extends Vue {
 
     // TODO dev-remove
     // @ts-ignore
-    this.$socket.client.on("sendNotification", (data) => console.log(data));
+    // this.$socket.client.on("sendNotification", data => console.log(data));
   }
 
   goToGame(): void {

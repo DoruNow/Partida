@@ -83,7 +83,7 @@ export default class PlayerView extends mixins(PlayingCardMapper, DeckMixin) {
 
     // TODO dev-remove
     // @ts-ignore
-    this.$socket.client.on("sendNotification", (data) => console.log(data));
+    // this.$socket.client.on("sendNotification", data => console.log(data));
     // @ts-ignore
     this.$socket.client.emit("getPlayers", { roomName: this.roomName });
     // @ts-ignore
